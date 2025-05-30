@@ -1,6 +1,6 @@
 # SpacetimeDB C++ SDK
 
-> ⚠️ **Early-stage prototype — not yet functional!**
+> ⚠️ **Early-stage — not yet functional!**
 
 A modern, header-only (plus a small .cpp core) C++ client for SpacetimeDB, with HTTP and JSON support out of the box.
 
