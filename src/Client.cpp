@@ -2,10 +2,6 @@
 #include "Config.hpp"
 #include "Utils/HttpClient.hpp"
 
-#include "Client.hpp"
-#include "Config.hpp"
-#include "Utils/HttpClient.hpp"
-
 namespace SpacetimeDb {
 
     struct Client::Impl {
@@ -17,6 +13,8 @@ namespace SpacetimeDb {
     Client::Builder& Client::Builder::WithConfig(const ClientConfig& cfg) {
         // STORE CONFIG
         // return *this;
+
+        throw std::runtime_error("Not implemented");
     }
 
     std::unique_ptr<Client> Client::Builder::Build() {
@@ -26,7 +24,8 @@ namespace SpacetimeDb {
         return client;
     }
 
-    void Client::Close() {
+    void Client::Close() const
+    {
         if (pImpl_ && pImpl_->isOpen) {
             // TEARDOWN
             pImpl_->isOpen = false;

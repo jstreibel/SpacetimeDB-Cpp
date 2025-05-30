@@ -25,7 +25,7 @@ target_include_directories(SpacetimeDbSdk PUBLIC
         $<INSTALL_INTERFACE:include>
 )
 
-# HTTP/WS/JSON dependencies (link as needed)
+# HTTP/WS/JSON dependencies
 # Use FetchContent to pull in cpr:
 include(FetchContent)
 FetchContent_Declare(
@@ -35,8 +35,15 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(cpr)
 
-target_link_libraries(SpacetimeDbSdk PUBLIC cpr::cpr)
-# For JSON support, link to nlohmann_json or similar
+# For JSON support, link to nlohmann_json
+FetchContent_Declare(
+        json
+        URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+)
+FetchContent_MakeAvailable(json)
+
+target_link_libraries(SpacetimeDbSdk PUBLIC cpr::cpr nlohmann_json::nlohmann_json)
 
 # find_package(cpr QUIET)
 # target_link_libraries(SpacetimeDbSdk PUBLIC cpr::cpr nlohmann_json::nlohmann_json)imeDbSdk PUBLIC cpr::cpr nlohmann_json::nlohmann_json)

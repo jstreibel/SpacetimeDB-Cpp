@@ -1,20 +1,33 @@
 #pragma once
 #include <string>
-#include "Error.hpp"
+#include <map>
+#include <cpr/cpr.h>
 
 namespace SpacetimeDb::Utils {
 
-    class HttpClient {
-    public:
-        HttpClient();
-        ~HttpClient();
+    /// A minimal HTTP response wrapper
+    struct HttpResponse {
+        int           StatusCode;
+        std::string   Body;
 
-        // PERFORM GET, POST, etc.
-        std::string Get(const std::string& url);
-        std::string Post(const std::string& url, const std::string& body, const std::string& contentType);
-
-    private:
-        // PIMPL or CURL HANDLE
+        /// for compatibility with previous code
+        [[nodiscard]] std::string text() const { return Body; }
     };
 
-} // namespace SpacetimeDb::Utils
+    class HttpClient {
+    public:
+        explicit HttpClient(std::string baseUrl="localhost", int timeoutMs = 30000);
+        ~HttpClient();
+
+        HttpResponse Get(const std::string& path,
+                         const std::map<std::string,std::string>& headers = {});
+        HttpResponse Post(const std::string& path,
+                          const std::string& body,
+                          const std::map<std::string,std::string>& headers = {});
+
+    private:
+        std::string       baseUrl_;
+        int               timeoutMs_;
+        cpr::Session      session_;
+    };
+} // namespace SpacetimeDb

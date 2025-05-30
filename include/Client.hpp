@@ -17,12 +17,12 @@ namespace SpacetimeDb {
         // BUILDER NESTED CLASS
         class Builder {
         public:
-            Builder& WithConfig(const ClientConfig& cfg);
-            std::unique_ptr<Client> Build();
+            static Builder& WithConfig(const ClientConfig& cfg);
+            static std::unique_ptr<Client> Build();
         };
 
         // CORE API METHODS
-        void Close();
+        void Close() const;
         // EXAMPLE: IDENTITY SERVICE ACCESSOR
         // IdentityClient& Identity();
 

@@ -1,23 +1,28 @@
 #include "Utils/HttpClient.hpp"
+#include <cpr/cpr.h>
 
 namespace SpacetimeDb::Utils {
 
-    HttpClient::HttpClient() {
-        // INIT LIBCURL OR OTHER CLIENT
+    HttpClient::HttpClient(std::string baseUrl, int timeoutMs)
+      : baseUrl_(std::move(baseUrl))
+      , timeoutMs_(timeoutMs)
+      , session_()
+    {
+        // configure the CPR session
+        session_.SetUrl(cpr::Url{baseUrl_});
+        session_.SetTimeout(cpr::Timeout{timeoutMs_});
     }
 
-    HttpClient::~HttpClient() {
-        // CLEANUP
+    HttpClient::~HttpClient() = default;
+
+    HttpResponse HttpClient::Get(const std::string& path, const std::map<std::string, std::string>& headers)
+    {
+        throw std::runtime_error("Not implemented");
     }
 
-    std::string HttpClient::Get(const std::string& url) {
-        // WRAP LIBCURL GET
-        return {};
+    HttpResponse HttpClient::Post(const std::string& path, const std::string& body,
+        const std::map<std::string, std::string>& headers)
+    {
+        throw std::runtime_error("Not implemented");
     }
-
-    std::string HttpClient::Post(const std::string& url, const std::string& body, const std::string& contentType) {
-        // WRAP LIBCURL POST
-        return {};
-    }
-
 } // namespace SpacetimeDb::Utils
