@@ -31,7 +31,7 @@ include(FetchContent)
 FetchContent_Declare(
         cpr
         GIT_REPOSITORY https://github.com/libcpr/cpr.git
-        GIT_TAG dd967cb48ea6bcbad9f1da5ada0db8ac0d532c06  # choose desired commit/tag
+        GIT_TAG dd967cb48ea6bcbad9f1da5ada0db8ac0d532c06
 )
 FetchContent_MakeAvailable(cpr)
 
@@ -44,6 +44,3 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(json)
 
 target_link_libraries(SpacetimeDbSdk PUBLIC cpr::cpr nlohmann_json::nlohmann_json)
-
-# find_package(cpr QUIET)
-# target_link_libraries(SpacetimeDbSdk PUBLIC cpr::cpr nlohmann_json::nlohmann_json)imeDbSdk PUBLIC cpr::cpr nlohmann_json::nlohmann_json)

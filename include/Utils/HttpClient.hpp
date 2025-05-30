@@ -7,7 +7,7 @@ namespace SpacetimeDb::Utils {
 
     /// A minimal HTTP response wrapper
     struct HttpResponse {
-        int           StatusCode;
+        long          StatusCode;
         std::string   Body;
 
         /// for compatibility with previous code
@@ -20,10 +20,10 @@ namespace SpacetimeDb::Utils {
         ~HttpClient();
 
         HttpResponse Get(const std::string& path,
-                         const std::map<std::string,std::string>& headers = {});
+                         const std::map<std::string,std::string>& headers = {}) const;
         HttpResponse Post(const std::string& path,
                           const std::string& body,
-                          const std::map<std::string,std::string>& headers = {});
+                          const std::map<std::string,std::string>& headers = {}) const;
 
     private:
         std::string       baseUrl_;
