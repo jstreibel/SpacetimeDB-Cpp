@@ -1,12 +1,15 @@
 # SpacetimeDB C++ SDK
 
+> ⚠️ **Early-stage prototype — not yet functional!**
+
 A modern, header-only (plus a small .cpp core) C++ client for SpacetimeDB, with HTTP and JSON support out of the box.
 
 ## Status
 
-- Version: **0.1.0**
-- Library: `SpacetimeDbSdk` (static)
-- Dependencies: [libcpr](https://github.com/libcpr/cpr) (HTTP), [nlohmann/json](https://github.com/nlohmann/json) (JSON)
+- Version: **0.1.0**  
+- Library: `SpacetimeDbSdk` (static)  
+- Dependencies: [libcpr](https://github.com/libcpr/cpr) (HTTP), [nlohmann/json](https://github.com/nlohmann/json) (JSON)  
+- ⚠️ **This SDK is very early-stage** and **not yet functional**—many pieces still need implementation, wiring and testing.
 
 ## 👹 Backlog
 
@@ -20,11 +23,12 @@ A modern, header-only (plus a small .cpp core) C++ client for SpacetimeDB, with 
 - [x] **DatabaseClient** + **DatabaseModels** (`ExecuteSqlRequest`, `ExecuteSqlResponse`, `PublishDocumentRequest`)
 - [x] **Examples** folder scaffold (`quickstart.cpp`, `subscribe.cpp`)
 - [x] **Tests** folder scaffold (`IdentityTests.cpp`, `DatabaseTests.cpp`, `UtilsTests.cpp`)
+
 - [ ] **Error handling**
     - Throw or return a `SpacetimeError` on non-2xx HTTP responses or JSON errors
     - Define `enum class ErrorCode` and exception types in `Utils/Error.hpp`
 - [ ] **Internal APIs**
-    - Move implementation‐only helpers into `SpacetimeDb::detail` namespace
+    - Move implementation-only helpers into `SpacetimeDb::detail` namespace
     - Consider **Pimpl** in public classes for ABI stability
 - [ ] **Asynchronous support**
     - Add `async` overloads returning `std::future<Json>` (or callbacks)
@@ -49,4 +53,4 @@ A modern, header-only (plus a small .cpp core) C++ client for SpacetimeDB, with 
 
 ---
 
-Feel free to pick any of the “Next Steps” and submit a PR. Let’s get this SDK to feature-complete status!
+Feel free to pick any of the “Next Steps” and submit a PR. Let’s get this SDK from prototype to production!  
