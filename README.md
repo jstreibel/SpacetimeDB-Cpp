@@ -8,7 +8,7 @@ A modern, header-only (plus a small .cpp core) C++ client for SpacetimeDB, with 
 - Library: `SpacetimeDbSdk` (static)
 - Dependencies: [libcpr](https://github.com/libcpr/cpr) (HTTP), [nlohmann/json](https://github.com/nlohmann/json) (JSON)
 
-## 🎯 Backlog
+## 👹 Backlog
 
 - [x] **Project layout** (`include/`, `src/`, `tools/CodegenTool/`, `examples/`, `tests/`)
 - [x] **CMakeLists.txt** with `FetchContent` for **libcpr**, example and test subdirectories
