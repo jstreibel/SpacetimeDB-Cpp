@@ -8,7 +8,7 @@ A modern, header-only (plus a small .cpp core) C++ client for SpacetimeDB, with 
 - Library: `SpacetimeDbSdk` (static)
 - Dependencies: [libcpr](https://github.com/libcpr/cpr) (HTTP), [nlohmann/json](https://github.com/nlohmann/json) (JSON)
 
-## ✅ Already Implemented
+## 🎯 Goals
 
 - [x] **Project layout** (`include/`, `src/`, `tools/CodegenTool/`, `examples/`, `tests/`)
 - [x] **CMakeLists.txt** with `FetchContent` for **libcpr**, example and test subdirectories
@@ -20,9 +20,6 @@ A modern, header-only (plus a small .cpp core) C++ client for SpacetimeDB, with 
 - [x] **DatabaseClient** + **DatabaseModels** (`ExecuteSqlRequest`, `ExecuteSqlResponse`, `PublishDocumentRequest`)
 - [x] **Examples** folder scaffold (`quickstart.cpp`, `subscribe.cpp`)
 - [x] **Tests** folder scaffold (`IdentityTests.cpp`, `DatabaseTests.cpp`, `UtilsTests.cpp`)
-
-## 🚀 Next Steps
-
 - [ ] **Error handling**
     - Throw or return a `SpacetimeError` on non-2xx HTTP responses or JSON errors
     - Define `enum class ErrorCode` and exception types in `Utils/Error.hpp`
