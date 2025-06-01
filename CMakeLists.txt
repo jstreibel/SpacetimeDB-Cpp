@@ -2,15 +2,15 @@ cmake_minimum_required(VERSION 3.15)
 project(SpacetimeDBSdk VERSION 0.1.0 LANGUAGES CXX)
 
 # Options
-option(BUILD_EXAMPLES "Build example executables" ON)
-option(BUILD_TESTS    "Build unit tests"          ON)
+option(STDB_BUILD_EXAMPLES "Build example executables" ON)
+option(STDB_BUILD_TESTS    "Build unit tests"          ON)
 
 # C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Include paths
-include_directories(${PROJECT_SOURCE_DIR}/include)
+include_directories(${PROJECT_SOURCE_DIR}/include/SpacetimeDB)
 
 # Source files
 file(GLOB_RECURSE SDK_SOURCES
@@ -55,24 +55,24 @@ set (ENABLE_CPP11   ON  CACHE BOOL "Use C++11 STL instead of Boost" FORCE )
 set (BUILD_EXAMPLES OFF CACHE BOOL "Build websocketpp examples."    FORCE )
 set (BUILD_TESTS    OFF CACHE BOOL "Build websocketpp tests."       FORCE )
 FetchContent_MakeAvailable(websocketpp)
-target_include_directories(SpacetimeDBSdk PUBLIC
-        ${websocketpp_SOURCE_DIR}   # <— so <websocketpp/...> can be found
-)
+# <— so <websocketpp/...> can be found:
+target_include_directories(SpacetimeDBSdk PUBLIC ${websocketpp_SOURCE_DIR})
 
 
 target_link_libraries(SpacetimeDBSdk PUBLIC
         cpr::cpr
         nlohmann_json::nlohmann_json
-        Websockets
+        # websocketpp::websocketpp
 )
 
 # Unit tests
-if ( BUILD_EXAMPLES )
-    message(STATUS "CMake 'BUILD_EXAMPLES' variable is set to ON, but examples not implemented yet")
-    # add_subdirectory(examples)
+if ( STDB_BUILD_EXAMPLES )
+    message(STATUS "Adding SpacetimeDB C++ SDK examples")
+    add_subdirectory(examples)
 endif ()
 
 # Examples
-if ( BUILD_TESTS )
+if ( STDB_BUILD_TESTS )
+    message(STATUS "Adding SpacetimeDB C++ SDK tests")
     add_subdirectory(tests)
 endif ()

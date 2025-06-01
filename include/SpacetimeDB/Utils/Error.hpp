@@ -4,10 +4,10 @@
 
 namespace SpacetimeDB::Utils {
 
-    class HttpError : public std::runtime_error {
+    class HttpError final : public std::runtime_error {
     public:
-        HttpError(int code, const std::string& msg)
-            : std::runtime_error(msg), Code(code) {}
+        HttpError(const int Code, const std::string& msg)
+            : std::runtime_error(msg), Code(Code) {}
         int Code;
     };
 

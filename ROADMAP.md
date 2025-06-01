@@ -1,4 +1,4 @@
-# SpacetimeClientSDKReference
+# Spacetime Client SDK Reference
 
 Below is a language-agnostic blueprint of the core components and required functionality for any client-side SpacetimeDB SDK. Every SDK must implement:
 

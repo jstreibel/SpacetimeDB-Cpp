@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <Utils/Json.hpp>
+#include <SpacetimeDB/Utils/Json.hpp>
 
 namespace SpacetimeDB {
 
