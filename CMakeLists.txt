@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.15)
-project(SpacetimeDbSdk VERSION 0.1.0 LANGUAGES CXX)
+project(SpacetimeDBSdk VERSION 0.1.0 LANGUAGES CXX)
 
 # Options
 option(BUILD_EXAMPLES "Build example executables" ON)
-option(BUILD_TESTS    "Build unit tests"       ON)
+option(BUILD_TESTS    "Build unit tests"          ON)
 
 # C++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -18,9 +18,9 @@ file(GLOB_RECURSE SDK_SOURCES
 )
 
 # SDK library
-add_library(SpacetimeDbSdk STATIC ${SDK_SOURCES})
+add_library(SpacetimeDBSdk STATIC ${SDK_SOURCES})
 
-target_include_directories(SpacetimeDbSdk PUBLIC
+target_include_directories(SpacetimeDBSdk PUBLIC
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:include>
 )
@@ -28,6 +28,8 @@ target_include_directories(SpacetimeDbSdk PUBLIC
 # HTTP/WS/JSON dependencies
 # Use FetchContent to pull in cpr:
 include(FetchContent)
+
+# ── Fetch Curl for People ─────────────────────────────────────────────────────
 FetchContent_Declare(
         cpr
         GIT_REPOSITORY https://github.com/libcpr/cpr.git
@@ -35,7 +37,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(cpr)
 
-# For JSON support, link to nlohmann_json
+# ── Fetch nlohmann_json ───────────────────────────────────────────────────────
 FetchContent_Declare(
         json
         URL https://github.com/nlohmann/json/releases/download/v3.12.0/json.tar.xz
@@ -43,4 +45,34 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(json)
 
-target_link_libraries(SpacetimeDbSdk PUBLIC cpr::cpr nlohmann_json::nlohmann_json)
+# ── Fetch WebSocket C++ ───────────────────────────────────────────────────────
+FetchContent_Declare(
+        websocketpp
+        GIT_REPOSITORY https://github.com/zaphoyd/websocketpp.git
+        GIT_TAG        master  # or whichever tag/commit you need
+)
+set (ENABLE_CPP11   ON  CACHE BOOL "Use C++11 STL instead of Boost" FORCE )
+set (BUILD_EXAMPLES OFF CACHE BOOL "Build websocketpp examples."    FORCE )
+set (BUILD_TESTS    OFF CACHE BOOL "Build websocketpp tests."       FORCE )
+FetchContent_MakeAvailable(websocketpp)
+target_include_directories(SpacetimeDBSdk PUBLIC
+        ${websocketpp_SOURCE_DIR}   # <— so <websocketpp/...> can be found
+)
+
+
+target_link_libraries(SpacetimeDBSdk PUBLIC
+        cpr::cpr
+        nlohmann_json::nlohmann_json
+        Websockets
+)
+
+# Unit tests
+if ( BUILD_EXAMPLES )
+    message(STATUS "CMake 'BUILD_EXAMPLES' variable is set to ON, but examples not implemented yet")
+    # add_subdirectory(examples)
+endif ()
+
+# Examples
+if ( BUILD_TESTS )
+    add_subdirectory(tests)
+endif ()

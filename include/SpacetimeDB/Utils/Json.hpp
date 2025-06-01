@@ -2,7 +2,7 @@
 
 #include <nlohmann/json.hpp>
 
-namespace SpacetimeDb::Utils {
+namespace SpacetimeDB::Utils {
 
     using Json = nlohmann::json;
 

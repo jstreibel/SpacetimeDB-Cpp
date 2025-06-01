@@ -2,7 +2,7 @@
 #include <string>
 #include <chrono>
 
-namespace SpacetimeDb {
+namespace SpacetimeDB {
 
     struct ClientConfig {
         std::string BaseUrl;

@@ -1,51 +1,52 @@
-#include "Utils/HttpClient.hpp"
-#include <cpr/cpr.h>
+#include "SpacetimeDB/Utils/HttpClient.hpp"
+#include <cpr/cpr.h>          // Example: using libcpr for HTTP
+#include <stdexcept>
 
-namespace SpacetimeDb::Utils {
-
-    HttpClient::HttpClient(std::string baseUrl, int timeoutMs)
-      : baseUrl_(std::move(baseUrl))
-      , timeoutMs_(timeoutMs)
-      , session_()
-    {
-        // configure the CPR session
-        session_.SetUrl(cpr::Url{baseUrl_});
-        session_.SetTimeout(cpr::Timeout{timeoutMs_});
+namespace SpacetimeDB {
+    Utils::HttpClient::HttpClient(std::string baseUrl, int timeoutMs)
+      : baseUrl_(std::move(baseUrl)), timeoutMs_(timeoutMs) {
+        // Optionally configure cpr::Session here
     }
 
-    HttpClient::~HttpClient() = default;
+    Utils::HttpClient::~HttpClient() {
+        // Cleanup if needed
+    }
 
-    HttpResponse HttpClient::Get(const std::string& path, const std::map<std::string, std::string>& headers) const
+    Utils::HttpResponse Utils::HttpClient::Get(const std::string& path,
+                                               const std::map<std::string, std::string>& headers) const
     {
-        // Build full URL
-        const std::string url = baseUrl_ + path;
-
-        // Perform the GET request
-        const cpr::Response r = cpr::Get(
-            cpr::Url{url},
-            cpr::Header{headers.begin(), headers.end()}, // for std::map compatibility
-            cpr::Timeout{timeoutMs_}
-        );
-
-        // Wrap and return
+        std::string url = baseUrl_ + path;
+        cpr::Session session;
+        session.SetUrl(cpr::Url{url});
+        session.SetTimeout(timeoutMs_);
+        for (auto& [k,v] : headers) {
+            session.SetHeader({{k, v}});
+        }
+        cpr::Response r = session.Get();
+        if (r.error) {
+            throw std::runtime_error("HTTP GET error: " + r.error.message);
+        }
         return HttpResponse{ r.status_code, r.text };
     }
 
-    HttpResponse HttpClient::Post(const std::string& path, const std::string& body,
-        const std::map<std::string, std::string>& headers) const
+    Utils::HttpResponse Utils::HttpClient::Post(const std::string& path,
+                                                const std::string& body,
+                                                const std::map<std::string, std::string>& headers) const
     {
-        // Build full URL
-        const std::string url = baseUrl_ + path;
-
-        // Perform the POST request
-        const cpr::Response r = cpr::Post(
-            cpr::Url{url},
-            cpr::Body{body},
-            cpr::Header{headers.begin(), headers.end()},
-            cpr::Timeout{timeoutMs_}
-        );
-
-        // Wrap and return
+        std::string url = baseUrl_ + path;
+        cpr::Session session;
+        session.SetUrl(cpr::Url{url});
+        session.SetTimeout(timeoutMs_);
+        for (auto& [k,v] : headers) {
+            session.SetHeader({{k, v}});
+        }
+        session.SetBody(cpr::Body{body});
+        session.SetHeader(cpr::Header{{"Content-Type", "application/json"}});
+        cpr::Response r = session.Post();
+        if (r.error) {
+            throw std::runtime_error("HTTP POST error: " + r.error.message);
+        }
         return HttpResponse{ r.status_code, r.text };
     }
-} // namespace SpacetimeDb::Utils
+
+} // namespace SpacetimeDB

@@ -1,14 +1,14 @@
 #pragma once
 
 #include <string>
-#include <Utils/Json.hpp>
+#include <SpacetimeDB/Utils/Json.hpp>
 
-namespace SpacetimeDb {
+namespace SpacetimeDB {
 
     /// Request payload for POST /identity
     struct CreateIdentityRequest {
         /// (no fields today – returns an empty JSON object)
-        [[nodiscard]] Utils::Json toJson() const {
+        [[nodiscard]] static Utils::Json toJson() {
             return Utils::Json::object();
         }
     };

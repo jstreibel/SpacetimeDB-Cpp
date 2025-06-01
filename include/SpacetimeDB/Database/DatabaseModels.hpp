@@ -3,7 +3,7 @@
 #include <string>
 #include <Utils/Json.hpp>
 
-namespace SpacetimeDb {
+namespace SpacetimeDB {
 
     /// Request for POST /db/{dbName}/sql
     struct ExecuteSqlRequest {

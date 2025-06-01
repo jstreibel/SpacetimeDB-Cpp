@@ -2,7 +2,7 @@
 #include <stdexcept>
 #include <string>
 
-namespace SpacetimeDb::Utils {
+namespace SpacetimeDB::Utils {
 
     class HttpError : public std::runtime_error {
     public:

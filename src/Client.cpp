@@ -1,8 +1,8 @@
-#include "Client.hpp"
+#include "../include/SpacetimeDB/Client.hpp"
 #include "Config.hpp"
 #include "Utils/HttpClient.hpp"
 
-namespace SpacetimeDb {
+namespace SpacetimeDB {
 
     struct Client::Impl {
         ClientConfig config;
