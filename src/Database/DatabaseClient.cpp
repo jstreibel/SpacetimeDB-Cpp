@@ -18,11 +18,11 @@ namespace SpacetimeDB {
         WebSocket_.Close();
     }
 
-    Utils::Json DatabaseClient::ExecuteSql(const std::string& ModuleName,
+    Utils::Result<Utils::Json> DatabaseClient::ExecuteSql(const std::string& ModuleName,
                                            const std::string& Sql,
                                            const Utils::Json& Params) const
     {
-        std::string path = "/v1/database/" + ModuleName + "/sql";
+        const std::string Path = "/v1/database/" + ModuleName + "/sql";
         Utils::Json payload = Utils::Json::object();
         payload["sql"] = Sql;
         if (!Params.is_null()) {
@@ -34,11 +34,17 @@ namespace SpacetimeDB {
         headers["Authorization"] = "Bearer " + Token_;
         headers["Content-Type"]  = "application/json";
 
-        Utils::HttpResponse resp = Http_.Post(path, payload.dump(), headers);
-        if (resp.StatusCode != 200) {
-            throw std::runtime_error("SQL failed (status " + std::to_string(resp.StatusCode) + ")");
+        const auto PostResult = Http_.Post(Path, payload.dump(), headers);
+        if (!Utils::IsValid(PostResult))
+        {
+            const auto Message = Utils::GetErrorMessage(PostResult);
+            ReturnError("Failed to POST to " + Path + ": " + Message);
         }
-        return Utils::Json::parse(resp.Body);
+        auto [StatusCode, Body] = Utils::GetResult(PostResult);
+        if (StatusCode != 200) {
+            ReturnError("SQL failed (status " + std::to_string(StatusCode) + ")");
+        }
+        return Utils::Json::parse(Body);
     }
 
     void DatabaseClient::Subscribe(const std::string& ModuleName,
@@ -47,7 +53,7 @@ namespace SpacetimeDB {
     {
         if (!WebSocketConnected_) {
             // Build ws:// URL
-            std::string WebSocketUrl = "ws://localhost:3000/v1/database/" + ModuleName + "/ws?token=" + Token_;
+            const std::string WebSocketUrl = "ws://localhost:3000/v1/database/" + ModuleName + "/ws?token=" + Token_;
             WebSocket_.Connect(WebSocketUrl);
             WebSocketConnected_ = true;
         }
@@ -65,12 +71,12 @@ namespace SpacetimeDB {
         WebSocket_.Send(subMsg);
     }
 
-    Utils::Json DatabaseClient::CallReducer(const std::string& ModuleName,
+    Utils::Result<Utils::Json> DatabaseClient::CallReducer(const std::string& ModuleName,
                                             const std::string& ReducerName,
                                             const Utils::Json& Args)
     {
         if (!WebSocketConnected_) {
-            std::string WebSocketUrl = "ws://localhost:3000/v1/database/" + ModuleName + "/ws?token=" + Token_;
+            const std::string WebSocketUrl = "ws://localhost:3000/v1/database/" + ModuleName + "/ws?token=" + Token_;
             WebSocket_.Connect(WebSocketUrl);
             WebSocketConnected_ = true;
         }
@@ -90,7 +96,7 @@ namespace SpacetimeDB {
             if (JsonMsg.contains("type") && JsonMsg["type"] == "ReducerResult") {
                 Promise.set_value(JsonMsg);
             } else if (JsonMsg.contains("type") && JsonMsg["type"] == "Error") {
-                // Could set_exception here, but for brevity, set_value with the error object
+                // TODO: Could set_exception here, but for brevity, set_value with the error object
                 Promise.set_value(JsonMsg);
             }
         });

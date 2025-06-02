@@ -3,6 +3,8 @@
 #include <map>
 #include <cpr/cpr.h>
 
+#include "Error.hpp"
+
 namespace SpacetimeDB::Utils {
 
     /// A minimal HTTP response wrapper
@@ -25,12 +27,15 @@ namespace SpacetimeDB::Utils {
         explicit HttpClient(std::string baseUrl="http://localhost:3000", int timeoutMs = 30000);
         ~HttpClient();
 
-        HttpResponse Get(const std::string& path,
-                         const std::map<std::string,std::string>& headers = {}) const;
-        HttpResponse Post(const std::string& path,
-                          const std::string& body,
-                          const std::map<std::string,std::string>& headers = {}) const;
+        Result<HttpResponse> Get(
+            const std::string& Path,
+            const std::map<std::string,std::string>& Headers = {}) const;
+        Result<HttpResponse> Post(
+            const std::string& Path,
+            const std::string& Body,
+            const std::map<std::string,std::string>& Headers = {}) const;
 
+        std::string GetBaseUrl() const { return baseUrl_; }
     private:
         std::string       baseUrl_;
         int               timeoutMs_;

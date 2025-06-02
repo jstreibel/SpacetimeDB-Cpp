@@ -30,7 +30,7 @@ namespace SpacetimeDB {
         /// Execute raw SQL via POST /v1/database/{module}/sql
         /// Returns the parsed JSON response (e.g., {"rows": [...]} or {"rows_affected": N}).
         ///
-        Utils::Json ExecuteSql(const std::string& ModuleName,
+        Utils::Result<Utils::Json> ExecuteSql(const std::string& ModuleName,
                                const std::string& Sql,
                                const Utils::Json& Params = {}) const;
 
@@ -49,7 +49,7 @@ namespace SpacetimeDB {
         ///   Block (or asynchronously wait) for a {"type":"ReducerResult",…} frame.
         /// Returns the raw JSON result.
         ///
-        Utils::Json CallReducer(const std::string& ModuleName,
+        Utils::Result<Utils::Json> CallReducer(const std::string& ModuleName,
                                 const std::string& ReducerName,
                                 const Utils::Json& Args);
 

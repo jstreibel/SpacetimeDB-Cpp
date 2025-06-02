@@ -1,8 +1,35 @@
 #pragma once
 #include <stdexcept>
 #include <string>
+#include <variant>
 
 namespace SpacetimeDB::Utils {
+
+    using ErrorType = std::runtime_error;
+
+    template<typename RETURN_TYPE>
+    using Result = std::variant<RETURN_TYPE, ErrorType>;
+
+    #define ReturnError(Message) \
+        return SpacetimeDB::Utils::ErrorType("Location " + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "\n\tMessage: \"" + (Message) + "\"")
+
+    template<typename RETURN_TYPE>
+    std::string GetErrorMessage(Result<RETURN_TYPE> SomeReturnedValue)
+    {
+        return std::get<std::runtime_error>(SomeReturnedValue).what();
+    }
+
+    template<typename RETURN_TYPE>
+    RETURN_TYPE GetResult(Result<RETURN_TYPE> SomeReturnedValue)
+    {
+        return std::get<RETURN_TYPE>(SomeReturnedValue);
+    }
+
+    template<typename RETURN_TYPE>
+    bool IsValid(Result<RETURN_TYPE> SomeReturnedValue)
+    {
+        return std::holds_alternative<RETURN_TYPE>(SomeReturnedValue);
+    }
 
     class HttpError final : public std::runtime_error {
     public:

@@ -7,8 +7,7 @@ namespace SpacetimeDB {
 
     /// Request payload for POST /identity
     struct CreateIdentityRequest {
-        /// (no fields today – returns an empty JSON object)
-        [[nodiscard]] static Utils::Json toJson() {
+        [[nodiscard]] static Utils::Json ToJson() {
             return Utils::Json::object();
         }
     };
@@ -19,11 +18,19 @@ namespace SpacetimeDB {
         std::string Token;  // may be empty if not returned by server
 
         /// Deserialize from the raw JSON response
-        static IdentityInfo fromJson(const Utils::Json& j) {
-            IdentityInfo info;
-            info.Id    = j.at("id").get<std::string>();
-            info.Token = j.value("token", std::string{});
-            return info;
+        static Utils::Result<IdentityInfo> FromJson(const Utils::Json& JsonData) {
+            IdentityInfo Info;
+
+            try
+            {
+                Info.Id    = JsonData.at("id").get<std::string>();
+                Info.Token = JsonData.value("token", std::string{});
+            } catch (const nlohmann::detail::out_of_range e)
+            {
+                ReturnError(e.what());
+            }
+
+            return Info;
         }
     };
 

@@ -63,15 +63,30 @@ static ChatMessage chatMessageFromJson(const SpacetimeDB::Utils::Json& j) {
 int main() {
     try {
         // ---- 3.1 Create an HTTP client pointing to your local SpacetimeDB server
-        SpacetimeDB::Utils::HttpClient Http("http://127.0.0.1:3000", /*timeoutMs=*/30000);
+        SpacetimeDB::Utils::HttpClient Http("http://localhost:3000", /*timeoutMs=*/30000);
 
         // ---- 3.2 Create an identity (POST /v1/identity)
         const SpacetimeDB::IdentityClient IdClient(Http);
-        const std::string Identity = IdClient.CreateIdentity();
+        const auto IdentityResult = IdClient.CreateIdentity();
+        if (!SpacetimeDB::Utils::IsValid(IdentityResult))
+        {
+            const auto Error = SpacetimeDB::Utils::GetErrorMessage(IdentityResult);
+            std::cerr << "[Identity] failed to create identity: " << Error << "\n";
+            return 1;
+        }
+        const auto Identity = SpacetimeDB::Utils::GetResult(IdentityResult);
         std::cout << "[Identity] generated ID: " << Identity << "\n";
 
         // ---- 3.3 Retrieve the associated JWT token (GET /v1/identity/{identity})
-        auto [Id, Token] = IdClient.GetIdentity(Identity);
+        const auto StdbIdentity = IdClient.GetIdentity(Identity);
+        if (!SpacetimeDB::Utils::IsValid(StdbIdentity))
+        {
+            const auto Error = SpacetimeDB::Utils::GetErrorMessage(StdbIdentity);
+            std::cerr << "[Identity] failed to get identity: " << Error << "\n";
+            return 1;
+        }
+        const auto& [Id, Token] = SpacetimeDB::Utils::GetResult(StdbIdentity);
+
         std::cout << "[Identity] received token: " << Token << "\n";
 
         // ---- 3.4 Prepare a WebSocket client and a DatabaseClient for the “chat” module
@@ -134,13 +149,20 @@ int main() {
             // and wait for { "type": "ReducerResult" } or an { "type": "Error", ... } frame.
 
             // Optionally, inspect the reducerResult for errors or returns:
-            if (SpacetimeDB::Utils::Json ReducerResult =
-                    DatabaseClient.CallReducer("chat", "SendMessage", Args);
-                ReducerResult.value("type", "") == "Error")
+            auto ReducerResult = DatabaseClient.CallReducer("chat", "SendMessage", Args);
+            // if (!SpacetimeDB::Utils::IsValid(ReducerResult))
             {
-                int  Code    = ReducerResult.value("code", 0);
-                std::string Message = ReducerResult.value("message", "");
-                std::cerr << "[SendMessage error: code " << Code << "] " << Message << "\n";
+                auto ReducerError = SpacetimeDB::Utils::GetResult(ReducerResult);
+                if (ReducerError.value("type", "") == "Error")
+                {
+                    int  Code    = ReducerError.value("code", 0);
+                    std::string Message = ReducerError.value("message", "");
+                    std::cerr << "[SendMessage error: code " << Code << "] " << Message << "\n";
+                }
+
+                const auto Error = SpacetimeDB::Utils::GetErrorMessage(ReducerResult);
+                std::cerr << "[SendMessage error: " << Error << "]\n";
+                continue;
             }
             // Otherwise, SendMessage has succeeded (it has no return payload in this example).
         }

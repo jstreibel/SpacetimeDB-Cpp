@@ -1,4 +1,6 @@
 #include "SpacetimeDB/Utils/HttpClient.hpp"
+
+#include <iostream>
 #include <cpr/cpr.h>          // Example: using libcpr for HTTP
 #include <stdexcept>
 
@@ -12,41 +14,42 @@ namespace SpacetimeDB {
         // Cleanup if needed
     }
 
-    Utils::HttpResponse Utils::HttpClient::Get(const std::string& path,
-                                               const std::map<std::string, std::string>& headers) const
+    Utils::Result<Utils::HttpResponse> Utils::HttpClient::Get(const std::string& Path,
+                                                              const std::map<std::string, std::string>& Headers) const
     {
-        std::string url = baseUrl_ + path;
-        cpr::Session session;
-        session.SetUrl(cpr::Url{url});
-        session.SetTimeout(timeoutMs_);
-        for (auto& [k,v] : headers) {
-            session.SetHeader({{k, v}});
+        const auto Url = baseUrl_ + Path;
+        cpr::Session Session;
+        Session.SetUrl(cpr::Url{Url});
+        Session.SetTimeout(timeoutMs_);
+        for (auto& [k,v] : Headers) {
+            Session.SetHeader({{k, v}});
         }
-        cpr::Response r = session.Get();
-        if (r.error) {
-            throw std::runtime_error("HTTP GET error: " + r.error.message);
+        const auto Response = Session.Get();
+        if (Response.error) {
+            ReturnError("HTTP GET error: " + Response.error.message);
         }
-        return HttpResponse{ r.status_code, r.text };
+        return HttpResponse{ Response.status_code, Response.text };
     }
 
-    Utils::HttpResponse Utils::HttpClient::Post(const std::string& path,
-                                                const std::string& body,
-                                                const std::map<std::string, std::string>& headers) const
+    Utils::Result<Utils::HttpResponse> Utils::HttpClient::Post(const std::string& Path,
+                                                const std::string& Body,
+                                                const std::map<std::string, std::string>& Headers) const
     {
-        std::string url = baseUrl_ + path;
-        cpr::Session session;
-        session.SetUrl(cpr::Url{url});
-        session.SetTimeout(timeoutMs_);
-        for (auto& [k,v] : headers) {
-            session.SetHeader({{k, v}});
+        const std::string Url = baseUrl_ + Path;
+        cpr::Session Session;
+        Session.SetUrl(cpr::Url{Url});
+        Session.SetTimeout(timeoutMs_);
+        for (auto& [Key,Value] : Headers) {
+            Session.SetHeader({{Key, Value}});
         }
-        session.SetBody(cpr::Body{body});
-        session.SetHeader(cpr::Header{{"Content-Type", "application/json"}});
-        cpr::Response r = session.Post();
-        if (r.error) {
-            throw std::runtime_error("HTTP POST error: " + r.error.message);
+        Session.SetBody(cpr::Body{Body});
+        Session.SetHeader(cpr::Header{{"Content-Type", "application/json"}});
+        const auto Response = Session.Post();
+        if (Response.error) {
+            ReturnError("HTTP POST error: " + Response.error.message);
         }
-        return HttpResponse{ r.status_code, r.text };
+
+        return HttpResponse{ Response.status_code, Response.text };
     }
 
 } // namespace SpacetimeDB
