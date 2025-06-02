@@ -14,15 +14,14 @@ A modern, header-only (plus a small .cpp core) C++ client for SpacetimeDB, with 
 ## 👹 Backlog
 
 - [x] **Project layout** (`include/`, `src/`, `tools/CodegenTool/`, `examples/`, `tests/`)
-- [x] **CMakeLists.txt** with `FetchContent` for **libcpr**, example and test subdirectories
 - [x] **HttpClient** wrapper around `cpr::cpr` (`Get`/`Post`, headers overload)
 - [x] **Json** alias (`using Json = nlohmann::json;`)
 - [x] **Config** & **Client** classes with Builder pattern
 - [x] **Umbrella header** (`SpacetimeDB.hpp`) and `version.hpp`
 - [x] **IdentityClient** + **IdentityModels** (`CreateIdentityRequest`, `IdentityInfo`)
-- [x] **DatabaseClient** + **DatabaseModels** (`ExecuteSqlRequest`, `ExecuteSqlResponse`, `PublishDocumentRequest`)
-- [x] **Examples** folder scaffold (`quickstart.cpp`, `subscribe.cpp`)
-- [x] **Tests** folder scaffold (`IdentityTests.cpp`, `DatabaseTests.cpp`, `UtilsTests.cpp`)
+- [ ] **DatabaseClient** + **DatabaseModels** (`ExecuteSqlRequest`, `ExecuteSqlResponse`, `PublishDocumentRequest`)
+- [ ] **Examples** (`quickstart.cpp`, `subscribe.cpp`)
+- [ ] **Tests** (`IdentityTests.cpp`, `DatabaseTests.cpp`, `UtilsTests.cpp`)
 
 - [ ] **Error handling**
     - Throw or return a `SpacetimeError` on non-2xx HTTP responses or JSON errors

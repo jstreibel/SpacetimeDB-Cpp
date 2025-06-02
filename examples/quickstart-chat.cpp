@@ -138,7 +138,7 @@ int main() {
                 std::cout << "[Identity] identity verification succeeded: ID and token match.\n";
                 break;
             case SpacetimeDB::VerifyIdentityResponse::ValidMismatch:
-                std::cout << "[Identity] identity verification succeeded: valid token, ID mismatch.\n";
+                std::cout << "[Identity] identity verification failed: valid token, ID mismatch.\n";
                 break;
             case SpacetimeDB::VerifyIdentityResponse::InvalidOrNoAuthorizationToken:
                 std::cout << "[Identity] identity verification failed: invalid or no authorization token.\n";
