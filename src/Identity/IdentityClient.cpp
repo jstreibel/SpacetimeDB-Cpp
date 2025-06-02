@@ -176,4 +176,25 @@ namespace SpacetimeDB {
 
         return {};
     }
+
+    Utils::Result<VerifyIdentityResponse> IdentityClient::VerifyIdentity(const VerifyIdentityRequest& Request) const
+    {
+        const auto Path = "/v1/identity/" + Request.IdentityToVerify.Id + "/verify";
+        const auto HttpGetResult =
+            http_.Get(
+                Path,
+                Request.GetHeaders());
+        if (!Utils::IsValid(HttpGetResult))
+        {
+            ReturnError("Failed to GET " + Path + ": " + Utils::GetErrorMessage(HttpGetResult));
+        }
+
+        const auto [StatusCode, Body] = Utils::GetResult(HttpGetResult);
+        if (StatusCode == 204)  return VerifyIdentityResponse{VerifyIdentityResponse::ValidMatch};
+        if (StatusCode == 400)  return VerifyIdentityResponse{VerifyIdentityResponse::ValidMismatch};
+        if (StatusCode == 401)  return VerifyIdentityResponse{VerifyIdentityResponse::InvalidOrNoAuthorizationToken};
+
+        ReturnError("Unhandled status code: "
+            + std::to_string(StatusCode) + " for GET method on Url " + http_.GetUrl(Path));
+    }
 } // namespace SpacetimeDb

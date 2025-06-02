@@ -45,6 +45,8 @@ namespace SpacetimeDB {
             const std::string& IdentityId,
             const SetEmailRequest& Request) const;
 
+        [[nodiscard]] Utils::Result<VerifyIdentityResponse> VerifyIdentity(const VerifyIdentityRequest& Request) const;
+
     private:
         Utils::HttpClient& http_;
     };

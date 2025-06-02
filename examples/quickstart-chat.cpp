@@ -124,6 +124,28 @@ int main() {
         */
 
 
+        auto IdVerificationResult = IdClient.VerifyIdentity(SpacetimeDB::VerifyIdentityRequest{Identity});
+        if (!SpacetimeDB::Utils::IsValid(IdVerificationResult))
+        {
+            const auto Error = SpacetimeDB::Utils::GetErrorMessage(IdVerificationResult);
+            std::cerr << "[Identity] failed to verify identity: " << Error << "\n";
+            return 1;
+        }
+        const auto [Status] = SpacetimeDB::Utils::GetResult(IdVerificationResult);
+        switch (Status)
+        {
+            case SpacetimeDB::VerifyIdentityResponse::ValidMatch:
+                std::cout << "[Identity] identity verification succeeded: ID and token match.\n";
+                break;
+            case SpacetimeDB::VerifyIdentityResponse::ValidMismatch:
+                std::cout << "[Identity] identity verification succeeded: valid token, ID mismatch.\n";
+                break;
+            case SpacetimeDB::VerifyIdentityResponse::InvalidOrNoAuthorizationToken:
+                std::cout << "[Identity] identity verification failed: invalid or no authorization token.\n";
+                break;
+        }
+
+
         return -1;
 
         // ---- 3.4 Prepare a WebSocket client and a DatabaseClient for the “chat” module

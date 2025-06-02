@@ -163,6 +163,18 @@ namespace SpacetimeDB {
     {
         IdentityInfo IdentityToVerify;
 
+        [[nodiscard]] std::map<std::string, std::string> GetHeaders() const
+        {
+            return {{"Authorization", IdentityToVerify.Token}};
+        }
+    };
 
+    struct VerifyIdentityResponse
+    {
+        enum Status {
+            ValidMatch,
+            ValidMismatch,
+            InvalidOrNoAuthorizationToken
+        } Status;
     };
 } // namespace SpacetimeDb
