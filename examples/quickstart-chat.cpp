@@ -75,29 +75,35 @@ int main() {
             return 1;
         }
         const auto Identity = SpacetimeDB::Utils::GetResult(IdentityResult);
-        std::cout << "[Identity] generated ID: " << Identity << "\n";
+        std::cout << "[Identity] generated ID: " << Identity.Id << "\n";
 
         // ---- 3.3 Retrieve the associated JWT token (GET /v1/identity/{identity})
-        const auto StdbIdentity = IdClient.GetIdentity(Identity);
-        if (!SpacetimeDB::Utils::IsValid(StdbIdentity))
+        const auto ClientDatabasesResult = IdClient.GetDatabases(Identity.Id);
+        if (!SpacetimeDB::Utils::IsValid(ClientDatabasesResult))
         {
-            const auto Error = SpacetimeDB::Utils::GetErrorMessage(StdbIdentity);
-            std::cerr << "[Identity] failed to get identity: " << Error << "\n";
+            const auto Error = SpacetimeDB::Utils::GetErrorMessage(ClientDatabasesResult);
+            std::cerr << "[Identity] failed to get databases: " << Error << "\n";
             return 1;
         }
-        const auto& [Id, Token] = SpacetimeDB::Utils::GetResult(StdbIdentity);
+        const auto Databases = SpacetimeDB::Utils::GetResult(ClientDatabasesResult);
 
-        std::cout << "[Identity] received token: " << Token << "\n";
+        std::cout << "[Identity] received databases addresses: ";
+        for (auto Address : Databases.Addresses)
+        {
+            std::cout << "'" << Address << "'; ";
+        }
+        std::cout << "\n";
 
         // ---- 3.4 Prepare a WebSocket client and a DatabaseClient for the “chat” module
         SpacetimeDB::WebSocketClient WebSocketClient;
+        auto Token = Identity.Token;
         SpacetimeDB::DatabaseClient  DatabaseClient(Http, WebSocketClient, Token);
 
         // ---- 3.5 Subscribe to new rows in the `messages` table over WebSocket.
         //         We listen for InsertEvent frames and print each incoming message.
         //
         //   The subscription query orders by created_at so we see messages in chronological order.
-        //
+
         DatabaseClient.Subscribe(
             "quickstart-chat",
             "SELECT * FROM messages ORDER BY created_at",

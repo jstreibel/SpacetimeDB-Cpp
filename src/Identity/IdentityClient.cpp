@@ -47,7 +47,7 @@ namespace SpacetimeDB {
     }
 
 
-    Utils::Result<std::string> IdentityClient::CreateIdentity(const CreateIdentityRequest& req) const
+    Utils::Result<IdentityInfo> IdentityClient::CreateIdentity(const CreateIdentityRequest& req) const
     {
         // serialize request
         const Utils::Json JsonRequest = SpacetimeDB::CreateIdentityRequest::ToJson();
@@ -72,13 +72,18 @@ namespace SpacetimeDB {
         {
             ReturnError("Response did not contain 'identity' field. JsonResponse: " + JsonResponse.dump() + "");
         }
-        return JsonResponse.at("identity").get<std::string>();
+
+        IdentityInfo Info;
+        Info.Id = JsonResponse.at("identity").get<std::string>();
+        Info.Token = JsonResponse.at("token").get<std::string>();
+
+        return Info;
     }
 
-    Utils::Result<IdentityInfo> IdentityClient::GetIdentity(const std::string& IdentityId) const
+    Utils::Result<DatabasesInfo> IdentityClient::GetDatabases(const std::string& IdentityId) const
     {
-        // GET /identity/{id}
-        const std::string Path = "/v1/identity/" + IdentityId;
+        // GET /identity/{id}/databases
+        const auto Path = "/v1/identity/" + IdentityId + "/databases";
         const auto HttpGetResult = http_.Get(Path, {});
         if (!Utils::IsValid(HttpGetResult))
         {
@@ -89,11 +94,19 @@ namespace SpacetimeDB {
 
         if (StatusCode != 200)
         {
-            ReturnError("Unhandled status code: " + std::to_string(StatusCode) + ". Path: " + Path);
+            ReturnError("Unhandled status code: " + std::to_string(StatusCode) + " for GET method on Url " + http_.GetUrl(Path));
         }
 
         const Utils::Json JsonResponse = Utils::Json::parse(Body);
-        return IdentityInfo::FromJson(JsonResponse);
+
+        const auto Info = DatabasesInfo::FromJson(JsonResponse);
+
+        if (!Utils::IsValid(Info))
+        {
+            ReturnError("Failed to parse JSON response to 'GET " + http_.GetUrl(Path) + "': " + JsonResponse.dump());
+        }
+
+        return Utils::GetResult(Info);
     }
 
 } // namespace SpacetimeDb

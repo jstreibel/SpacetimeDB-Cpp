@@ -35,6 +35,8 @@ namespace SpacetimeDB::Utils {
             const std::string& Body,
             const std::map<std::string,std::string>& Headers = {}) const;
 
+        std::string GetUrl(const std::string &Path) const;
+
         std::string GetBaseUrl() const { return baseUrl_; }
     private:
         std::string       baseUrl_;

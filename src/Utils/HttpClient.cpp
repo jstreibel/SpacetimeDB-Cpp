@@ -35,7 +35,7 @@ namespace SpacetimeDB {
                                                 const std::string& Body,
                                                 const std::map<std::string, std::string>& Headers) const
     {
-        const std::string Url = baseUrl_ + Path;
+        const auto Url = GetUrl(Path);
         cpr::Session Session;
         Session.SetUrl(cpr::Url{Url});
         Session.SetTimeout(timeoutMs_);
@@ -52,4 +52,8 @@ namespace SpacetimeDB {
         return HttpResponse{ Response.status_code, Response.text };
     }
 
+    std::string Utils::HttpClient::GetUrl(const std::string& Path) const
+    {
+        return baseUrl_ + Path;
+    }
 } // namespace SpacetimeDB

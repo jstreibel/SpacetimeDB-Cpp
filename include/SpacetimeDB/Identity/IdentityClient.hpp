@@ -21,13 +21,13 @@ namespace SpacetimeDB {
         /// Create a new identity by POSTing {} to /v1/identity.
         /// Returns the newly generated identity string.
         ///
-        [[nodiscard]] Utils::Result<std::string> CreateIdentity(const CreateIdentityRequest& req = CreateIdentityRequest()) const;
+        [[nodiscard]] Utils::Result<IdentityInfo> CreateIdentity(const CreateIdentityRequest& req = CreateIdentityRequest()) const;
 
         ///
-        /// Fetch existing identity info via GET /v1/identity/{identityId}.
-        /// Returns IdentityInfo, possibly containing a refreshed token.
+        /// Fetch database addresses via GET /v1/identity/{identityId}/databases.
+        /// Returns DatabasesInfo.
         ///
-        [[nodiscard]] Utils::Result<IdentityInfo> GetIdentity(const std::string& IdentityId) const;
+        [[nodiscard]] Utils::Result<DatabasesInfo> GetDatabases(const std::string& IdentityId) const;
 
     private:
         Utils::HttpClient& http_;
