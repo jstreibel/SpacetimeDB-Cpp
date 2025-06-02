@@ -27,17 +27,17 @@ namespace SpacetimeDB::Utils {
         explicit HttpClient(std::string baseUrl="http://localhost:3000", int timeoutMs = 30000);
         ~HttpClient();
 
-        Result<HttpResponse> Get(
+        [[nodiscard]] Result<HttpResponse> Get(
             const std::string& Path,
             const std::map<std::string,std::string>& Headers = {}) const;
-        Result<HttpResponse> Post(
+        [[nodiscard]] Result<HttpResponse> Post(
             const std::string& Path,
             const std::string& Body,
             const std::map<std::string,std::string>& Headers = {}) const;
 
-        std::string GetUrl(const std::string &Path) const;
+        [[nodiscard]] std::string GetUrl(const std::string &Path) const;
 
-        std::string GetBaseUrl() const { return baseUrl_; }
+        [[nodiscard]] std::string GetBaseUrl() const { return baseUrl_; }
     private:
         std::string       baseUrl_;
         int               timeoutMs_;

@@ -62,11 +62,12 @@ static ChatMessage chatMessageFromJson(const SpacetimeDB::Utils::Json& j) {
 
 int main() {
     try {
-        // ---- 3.1 Create an HTTP client pointing to your local SpacetimeDB server
         SpacetimeDB::Utils::HttpClient Http("http://localhost:3000", /*timeoutMs=*/30000);
 
-        // ---- 3.2 Create an identity (POST /v1/identity)
+
         const SpacetimeDB::IdentityClient IdClient(Http);
+
+
         const auto IdentityResult = IdClient.CreateIdentity();
         if (!SpacetimeDB::Utils::IsValid(IdentityResult))
         {
@@ -77,7 +78,18 @@ int main() {
         const auto Identity = SpacetimeDB::Utils::GetResult(IdentityResult);
         std::cout << "[Identity] generated ID: " << Identity.Id << "\n";
 
-        // ---- 3.3 Retrieve the associated JWT token (GET /v1/identity/{identity})
+
+        auto PublicKeyResult = IdClient.GetPublicKey();
+        if (!SpacetimeDB::Utils::IsValid(PublicKeyResult))
+        {
+            const auto Error = SpacetimeDB::Utils::GetErrorMessage(PublicKeyResult);
+            std::cerr << "[Identity] failed to get public key: " << Error << "\n";
+            return 1;
+        }
+        const auto [Data] = SpacetimeDB::Utils::GetResult(PublicKeyResult);
+        std::cout << "[Identity] received public key <application/pem-certificate-chain>:\n" << Data << "\n";
+
+
         const auto ClientDatabasesResult = IdClient.GetDatabases(Identity.Id);
         if (!SpacetimeDB::Utils::IsValid(ClientDatabasesResult))
         {
@@ -86,13 +98,33 @@ int main() {
             return 1;
         }
         const auto Databases = SpacetimeDB::Utils::GetResult(ClientDatabasesResult);
-
-        std::cout << "[Identity] received databases addresses: ";
-        for (auto Address : Databases.Addresses)
+        std::cout << "[Identity] received databases addresses for generated ID: ";
+        if (Databases.Addresses.empty())
+        {
+            std::cout << "none\n";
+        }
+        else for (const auto& Address : Databases.Addresses)
         {
             std::cout << "'" << Address << "'; ";
         }
-        std::cout << "\n";
+
+
+        /*
+        auto EmailResponse = IdClient.SetEmail(
+            Identity.Id,
+            SpacetimeDB::SetEmailRequest{"johnny@home.com", Identity.Token});
+        if (!SpacetimeDB::Utils::IsValid(EmailResponse))
+        {
+            const auto Error = SpacetimeDB::Utils::GetErrorMessage(EmailResponse);
+            std::cerr << "[Identity] failed to set email: " << Error << "\n";
+            return 1;
+        }
+        const auto Email = SpacetimeDB::Utils::GetResult(EmailResponse);
+        std::cout << "[Identity] received email for generated ID. " << "\n";
+        */
+
+
+        return -1;
 
         // ---- 3.4 Prepare a WebSocket client and a DatabaseClient for the “chat” module
         SpacetimeDB::WebSocketClient WebSocketClient;

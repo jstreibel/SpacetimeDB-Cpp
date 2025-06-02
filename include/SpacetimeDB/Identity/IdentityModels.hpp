@@ -3,24 +3,88 @@
 #include <iostream>
 #include <string>
 #include <SpacetimeDB/Utils/Json.hpp>
+#include <utility>
 
 namespace SpacetimeDB {
 
-    /// Request payload for POST /identity
+    /// Request payload for POST /v1/identity
+    /// -> Generate a new identity and token.
     struct CreateIdentityRequest {
-        [[nodiscard]] static Utils::Json ToJson() {
-            return Utils::Json::object();
+        [[nodiscard]]
+        Utils::Json ToJson() const { return Utils::Json::object(); }
+        [[nodiscard]]
+        std::map<std::string, std::string> GetHeaders() const
+        {
+            // return {{"Content-Type", "application/json"}};
+            return {};
         }
     };
 
-    /// Request payload for GET /identity/{id}/databases
+    /// Response payload for POST /v1/identity/
+    struct IdentityInfo {
+        std::string Id;
+        std::string Token;  // may be empty if not returned by server
+
+        /// Deserialize from the raw JSON response
+        static Utils::Result<IdentityInfo> FromJson(const Utils::Json& JsonData) {
+            IdentityInfo Info;
+
+            try
+            {
+                Info.Id    = JsonData.at("id").get<std::string>();
+                Info.Token = JsonData.value("token", std::string{});
+            } catch (const nlohmann::detail::out_of_range& e)
+            {
+                ReturnError(e.what() + std::string(" in ") + JsonData.dump() + ". ");
+            }
+
+            return Info;
+        }
+    };
+
+
+    /// Request payload for POST /v1/identity/websocket-token
+    /// -> Generate a short-lived access token for use in untrusted contexts.
+    struct GetIdentityWebSocketTokenRequest
+    {
+        std::string Token;
+
+        explicit GetIdentityWebSocketTokenRequest(std::string Token) : Token(std::move(Token)) {}
+
+        std::map<std::string, std::string> GetHeaders() const { return {{"Authorization", Token}}; }
+
+        [[nodiscard]] static Utils::Json ToJson(const GetIdentityWebSocketTokenRequest& Request)
+        {
+            return Utils::Json::object();
+        }
+
+        
+    };
+
+    /// Response for POST /v1/identity/websocket-token
+    struct IdentityWebSocketTokenResponse
+    {
+        std::string Token;
+        static Utils::Result<IdentityWebSocketTokenResponse> FromJson(const Utils::Json& JsonData)
+        {
+            if (!JsonData.contains("token"))
+            {
+                ReturnError("Response did not contain 'token' field. JsonResponse: " + JsonData.dump() + "");
+            }
+            return IdentityWebSocketTokenResponse{JsonData["token"]};
+        }
+    };
+
+
+    /// Request payload for GET /v1/identity/{id}/databases
+    /// -> List databases owned by an identity.
     struct ListOwnedDatabasesRequest {
-        [[nodiscard]] static Utils::Json ToJson() {
+        [[nodiscard]] Utils::Json ToJson() {
             return Utils::Json::object();
         }
     };
 
-    /// Response payload for GET /identity/{id}/databases
+    /// Response payload for GET /v1/identity/{id}/databases
     struct DatabasesInfo
     {
         std::vector<std::string> Addresses;
@@ -28,7 +92,7 @@ namespace SpacetimeDB {
         static Utils::Result<DatabasesInfo> FromJson(const Utils::Json& JsonData) {
             DatabasesInfo Info;
 
-            /* According to SpacetiomeDB DOCS:
+            /* According to SpacetimeDB DOCS:
             * GET /v1/identity/:identity/databases`
             * List all databases owned by an identity.
             * Returns JSON in the form:
@@ -39,7 +103,7 @@ namespace SpacetimeDB {
             * BUT APPARENTLY, it is "identities", instead of "addresses"
             */
 
-            // const auto Key = "addresses";
+            // const auto Key = "addresses"; // should be this, according to docs, but in reality its the following:
             const auto Key = "identities";
 
             if (!JsonData.contains(Key))
@@ -53,26 +117,52 @@ namespace SpacetimeDB {
         }
     };
 
-    /// Response payload for GET /identity/{id}
-    struct IdentityInfo {
-        std::string Id;
-        std::string Token;  // may be empty if not returned by server
 
-        /// Deserialize from the raw JSON response
-        static Utils::Result<IdentityInfo> FromJson(const Utils::Json& JsonData) {
-            IdentityInfo Info;
-
-            try
-            {
-                Info.Id    = JsonData.at("id").get<std::string>();
-                Info.Token = JsonData.value("token", std::string{});
-            } catch (const nlohmann::detail::out_of_range e)
-            {
-                ReturnError(e.what() + std::string(" in ") + JsonData.dump() + ". ");
-            }
-
-            return Info;
+    /// GET /v1/identity/public-key	Get the public key used for verifying tokens.
+    /// Returns a response of content-type application/pem-certificate-chain.
+    struct GetPublicKeyRequest
+    {
+        [[nodiscard]] std::map<std::string, std::string> GetHeaders() const {
+            // return {{"Content-Type", "application/pem-certificate-chain"}};
+            return {};
         }
     };
 
+    struct GetPublicKeyResponse
+    {
+        std::string Data;
+
+        static Utils::Result<GetPublicKeyResponse> FromPemCertificateChain(const std::string& Data) {
+            return GetPublicKeyResponse{Data};
+        }
+    };
+
+
+    /// POST /v1/identity/:identity/set-email
+    /// Associate an email with a Spacetime identity
+    struct SetEmailRequest
+    {
+        std::string Email;
+        std::string AuthorizationToken;
+
+        [[nodiscard]] Utils::Json ToJson() const {
+            return Utils::Json{{"email", Email}};
+        }
+
+        [[nodiscard]] std::map<std::string, std::string> GetHeaders() const {
+            return {{"Authorization", AuthorizationToken}};
+        }
+    };
+
+    struct SetEmailResponse { };
+
+
+    /// GET /v1/identity/{id}/verify
+    /// Verify the validity of an identity/token pair.
+    struct VerifyIdentityRequest
+    {
+        IdentityInfo IdentityToVerify;
+
+
+    };
 } // namespace SpacetimeDb
