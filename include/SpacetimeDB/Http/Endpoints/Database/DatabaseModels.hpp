@@ -1,7 +1,7 @@
 #pragma once
 
 #include <string>
-#include <SpacetimeDB/Utils/Json.hpp>
+#include <Http/Json.hpp>
 
 namespace SpacetimeDB {
 
@@ -9,25 +9,25 @@ namespace SpacetimeDB {
     struct ExecuteSqlRequest {
         std::string Query;
 
-        [[nodiscard]] Utils::Json toJson() const {
-            return Utils::Json{{"query", Query}};
+        [[nodiscard]] Json toJson() const {
+            return Json{{"query", Query}};
         }
     };
 
     /// Typed wrapper around the raw SQL response JSON
     struct ExecuteSqlResponse {
-        Utils::Json Raw;  // you can later add helpers to parse rows/columns
+        Json Raw;  // you can later add helpers to parse rows/columns
 
-        static ExecuteSqlResponse fromJson(const Utils::Json& j) {
+        static ExecuteSqlResponse fromJson(const Json& j) {
             return ExecuteSqlResponse{ j };
         }
     };
 
     /// Request for POST /db/{dbName}/collections/{coll}/documents
     struct PublishDocumentRequest {
-        Utils::Json Document;
+        Json Document;
 
-        [[nodiscard]] Utils::Json toJson() const {
+        [[nodiscard]] Json toJson() const {
             return Document;
         }
     };

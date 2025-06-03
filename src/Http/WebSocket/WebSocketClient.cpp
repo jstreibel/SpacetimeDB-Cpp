@@ -1,4 +1,4 @@
-#include "SpacetimeDB/WebSocket/WebSocketClient.hpp"
+#include "Http/WebSocket/WebSocketClient.hpp"
 #include <websocketpp/config/asio_no_tls_client.hpp>
 #include <websocketpp/client.hpp>
 #include <thread>
@@ -11,7 +11,7 @@ namespace SpacetimeDB {
         wspp_client    client;
         websocketpp::connection_hdl connection;
         std::thread    runThread;
-        std::function<void(const Utils::Json&)> recvCallback;
+        std::function<void(const Json&)> recvCallback;
         bool  connected{false};
     };
 
@@ -41,7 +41,7 @@ namespace SpacetimeDB {
             [ctx](websocketpp::connection_hdl hdl, wspp_client::message_ptr msg)
             {
                 try {
-                    Utils::Json j = Utils::Json::parse(msg->get_payload());
+                    Json j = Json::parse(msg->get_payload());
                     if (ctx->recvCallback) {
                         ctx->recvCallback(j);
                     }
@@ -71,7 +71,7 @@ namespace SpacetimeDB {
         // e.g.: this->context_ = ctx;
     }
 
-    void WebSocketClient::Send(const Utils::Json& message) {
+    void WebSocketClient::Send(const Json& message) {
         throw std::runtime_error("Not implemented");
         // if not connected, throw
         // auto ctx = context_.lock();
@@ -79,7 +79,7 @@ namespace SpacetimeDB {
         // ctx->client.send(ctx->connection, message.dump(), websocketpp::frame::opcode::text);
     }
 
-    void WebSocketClient::OnReceive(std::function<void(const Utils::Json&)> callback) {
+    void WebSocketClient::OnReceive(std::function<void(const Json&)> callback) {
         throw std::runtime_error("Not implemented");
         // auto ctx = context_.lock();
         // ctx->recvCallback = std::move(callback);

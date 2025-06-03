@@ -3,7 +3,7 @@
 #include <string>
 #include <variant>
 
-namespace SpacetimeDB::Utils {
+namespace SpacetimeDB {
 
     using ErrorType = std::runtime_error;
 
@@ -11,10 +11,10 @@ namespace SpacetimeDB::Utils {
     using Result = std::variant<RETURN_TYPE, ErrorType>;
 
     #define ReturnError(Message) \
-        return SpacetimeDB::Utils::ErrorType("Location " + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "\n\tMessage: \"" + (Message) + "\"")
+        return SpacetimeDB::ErrorType("Location " + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "\n\tMessage: \"" + (Message) + "\"")
 
     #define OnError(CallResult, Message) \
-        if (!SpacetimeDB::Utils::IsValid(CallResult)) ReturnError(Message);
+        if (!SpacetimeDB::IsValid(CallResult)) ReturnError(Message);
 
 
     template<typename RETURN_TYPE>
@@ -42,4 +42,4 @@ namespace SpacetimeDB::Utils {
         int Code;
     };
 
-} // namespace SpacetimeDb::Utils
+} // namespace SpacetimeDb

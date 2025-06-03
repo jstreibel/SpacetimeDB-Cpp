@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Config.hpp"
-#include "Utils/HttpClient.hpp"
+#include "Http/HttpClient.hpp"
 #include <memory>
 
 namespace SpacetimeDB {

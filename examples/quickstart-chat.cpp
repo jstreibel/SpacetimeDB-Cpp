@@ -23,11 +23,11 @@
 //    We assume the SDK layout defined in SpacetimeClientSDKReference.md has been applied.
 // -----------------------------------------------------------------------------
 
-#include "Utils/HttpClient.hpp"
-#include "Identity/IdentityClient.hpp"
-#include "WebSocket/WebSocketClient.hpp"
-#include "Database/DatabaseClient.hpp"
-#include "Utils/Json.hpp"
+#include "SpacetimeDB/Http/HttpClient.hpp"
+#include "SpacetimeDB/Http/Endpoints/Identity/IdentityClient.hpp"
+#include "SpacetimeDB/Http/WebSocket/WebSocketClient.hpp"
+#include "SpacetimeDB/Http/Endpoints/Database/DatabaseClient.hpp"
+#include "SpacetimeDB/Http/Json.hpp"
 
 #include <iostream>
 #include <string>
@@ -46,7 +46,7 @@ struct ChatMessage {
     std::string created_at;
 };
 
-static ChatMessage chatMessageFromJson(const SpacetimeDB::Utils::Json& j) {
+static ChatMessage chatMessageFromJson(const SpacetimeDB::Json& j) {
     ChatMessage msg;
     msg.id         = j.at("id").get<std::string>();
     msg.sender     = j.at("sender").get<std::string>();
@@ -62,54 +62,54 @@ static ChatMessage chatMessageFromJson(const SpacetimeDB::Utils::Json& j) {
 
 int main() {
     try {
-        SpacetimeDB::Utils::HttpClient Http("http://localhost:3000", /*timeoutMs=*/30000);
+        SpacetimeDB::HttpClient Http("http://localhost:3000", /*timeoutMs=*/30000);
 
 
         const SpacetimeDB::IdentityClient IdClient(Http);
 
 
         const auto IdentityResult = IdClient.CreateIdentity();
-        if (!SpacetimeDB::Utils::IsValid(IdentityResult))
+        if (!SpacetimeDB::IsValid(IdentityResult))
         {
-            const auto Error = SpacetimeDB::Utils::GetErrorMessage(IdentityResult);
+            const auto Error = SpacetimeDB::GetErrorMessage(IdentityResult);
             std::cerr << "[Identity] failed to create identity: " << Error << "\n";
             return 1;
         }
-        const auto Identity = SpacetimeDB::Utils::GetResult(IdentityResult);
+        const auto Identity = SpacetimeDB::GetResult(IdentityResult);
         std::cout << "[Identity] generated ID: " << Identity.Id << "\n";
 
 
         auto WebSocketRequest = SpacetimeDB::GetIdentityWebSocketTokenRequest{Identity.Token};
         const auto ShortTokenResult = IdClient.GetWebSocketToken(WebSocketRequest);
-        if (!SpacetimeDB::Utils::IsValid(ShortTokenResult))
+        if (!SpacetimeDB::IsValid(ShortTokenResult))
         {
-            const auto Error = SpacetimeDB::Utils::GetErrorMessage(ShortTokenResult);
+            const auto Error = SpacetimeDB::GetErrorMessage(ShortTokenResult);
             std::cerr << "[Identity] failed to get websocket token: " << Error << "\n";
             return 1;
         }
-        const auto [ShortLivedToken] = SpacetimeDB::Utils::GetResult(ShortTokenResult);
+        const auto [ShortLivedToken] = SpacetimeDB::GetResult(ShortTokenResult);
         std::cout << "[Identity] got websocket token: " << ShortLivedToken << "\n";
 
 
         auto PublicKeyResult = IdClient.GetPublicKey();
-        if (!SpacetimeDB::Utils::IsValid(PublicKeyResult))
+        if (!SpacetimeDB::IsValid(PublicKeyResult))
         {
-            const auto Error = SpacetimeDB::Utils::GetErrorMessage(PublicKeyResult);
+            const auto Error = SpacetimeDB::GetErrorMessage(PublicKeyResult);
             std::cerr << "[Identity] failed to get public key: " << Error << "\n";
             return 1;
         }
-        const auto [Data] = SpacetimeDB::Utils::GetResult(PublicKeyResult);
+        const auto [Data] = SpacetimeDB::GetResult(PublicKeyResult);
         std::cout << "[Identity] received public key <application/pem-certificate-chain>:\n" << Data << "\n";
 
 
         const auto ClientDatabasesResult = IdClient.GetDatabases(Identity.Id);
-        if (!SpacetimeDB::Utils::IsValid(ClientDatabasesResult))
+        if (!SpacetimeDB::IsValid(ClientDatabasesResult))
         {
-            const auto Error = SpacetimeDB::Utils::GetErrorMessage(ClientDatabasesResult);
+            const auto Error = SpacetimeDB::GetErrorMessage(ClientDatabasesResult);
             std::cerr << "[Identity] failed to get databases: " << Error << "\n";
             return 1;
         }
-        const auto [Addresses] = SpacetimeDB::Utils::GetResult(ClientDatabasesResult);
+        const auto [Addresses] = SpacetimeDB::GetResult(ClientDatabasesResult);
         std::cout << "[Identity] received databases addresses for generated ID: ";
         if (Addresses.empty()) std::cout << "none\n";
         else for (const auto& Address : Addresses) std::cout << "'" << Address << "'; ";
@@ -119,25 +119,25 @@ int main() {
         auto EmailResponse = IdClient.SetEmail(
             Identity.Id,
             SpacetimeDB::SetEmailRequest{"johnny@home.com", Identity.Token});
-        if (!SpacetimeDB::Utils::IsValid(EmailResponse))
+        if (!SpacetimeDB::IsValid(EmailResponse))
         {
-            const auto Error = SpacetimeDB::Utils::GetErrorMessage(EmailResponse);
+            const auto Error = SpacetimeDB::GetErrorMessage(EmailResponse);
             std::cerr << "[Identity] failed to set email: " << Error << "\n";
             return 1;
         }
-        const auto Email = SpacetimeDB::Utils::GetResult(EmailResponse);
+        const auto Email = SpacetimeDB::GetResult(EmailResponse);
         std::cout << "[Identity] received email for generated ID. " << "\n";
         */
 
 
         auto IdVerificationResult = IdClient.VerifyIdentity(SpacetimeDB::VerifyIdentityRequest{Identity});
-        if (!SpacetimeDB::Utils::IsValid(IdVerificationResult))
+        if (!SpacetimeDB::IsValid(IdVerificationResult))
         {
-            const auto Error = SpacetimeDB::Utils::GetErrorMessage(IdVerificationResult);
+            const auto Error = SpacetimeDB::GetErrorMessage(IdVerificationResult);
             std::cerr << "[Identity] failed to verify identity: " << Error << "\n";
             return 1;
         }
-        switch (const auto [Status] = SpacetimeDB::Utils::GetResult(IdVerificationResult); Status)
+        switch (const auto [Status] = SpacetimeDB::GetResult(IdVerificationResult); Status)
         {
             case SpacetimeDB::VerifyIdentityResponse::ValidMatch:
                 std::cout << "[Identity] identity verification succeeded: ID and token match.\n";
@@ -165,12 +165,12 @@ int main() {
         DatabaseClient.Subscribe(
             "quickstart-chat",
             "SELECT * FROM messages ORDER BY created_at",
-            [](const SpacetimeDB::Utils::Json& EventJson)
+            [](const SpacetimeDB::Json& EventJson)
             {
                 // Only handle InsertEvent frames
                 if (EventJson.value("type", "") == "InsertEvent") {
                 // The “row” field contains the new chat message as a JSON object.
-                const SpacetimeDB::Utils::Json& Row = EventJson.at("row");
+                const SpacetimeDB::Json& Row = EventJson.at("row");
                 ChatMessage Message = chatMessageFromJson(Row);
 
                 // Print in format: [timestamp] sender: content
@@ -204,7 +204,7 @@ int main() {
             }
 
             // Build reducer arguments manually into JSON
-            SpacetimeDB::Utils::Json Args = SpacetimeDB::Utils::Json();
+            SpacetimeDB::Json Args = SpacetimeDB::Json();
             Args["sender"]  = Sender;
             Args["content"] = Line;
 
@@ -214,9 +214,9 @@ int main() {
 
             // Optionally, inspect the reducerResult for errors or returns:
             auto ReducerResult = DatabaseClient.CallReducer("chat", "SendMessage", Args);
-            // if (!SpacetimeDB::Utils::IsValid(ReducerResult))
+            // if (!SpacetimeDB::IsValid(ReducerResult))
             {
-                auto ReducerError = SpacetimeDB::Utils::GetResult(ReducerResult);
+                auto ReducerError = SpacetimeDB::GetResult(ReducerResult);
                 if (ReducerError.value("type", "") == "Error")
                 {
                     int  Code    = ReducerError.value("code", 0);
@@ -224,7 +224,7 @@ int main() {
                     std::cerr << "[SendMessage error: code " << Code << "] " << Message << "\n";
                 }
 
-                const auto Error = SpacetimeDB::Utils::GetErrorMessage(ReducerResult);
+                const auto Error = SpacetimeDB::GetErrorMessage(ReducerResult);
                 std::cerr << "[SendMessage error: " << Error << "]\n";
                 continue;
             }

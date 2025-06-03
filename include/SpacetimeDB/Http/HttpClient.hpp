@@ -5,7 +5,7 @@
 
 #include "Error.hpp"
 
-namespace SpacetimeDB::Utils {
+namespace SpacetimeDB {
 
     /// A minimal HTTP response wrapper
     struct HttpResponse {

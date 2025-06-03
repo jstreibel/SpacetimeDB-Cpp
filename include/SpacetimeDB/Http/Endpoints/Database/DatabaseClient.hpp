@@ -1,9 +1,9 @@
 #pragma once
 
-#include <SpacetimeDB/Utils/HttpClient.hpp>
-#include <SpacetimeDB/Utils/Json.hpp>
+#include <Http/HttpClient.hpp>
+#include <Http/Json.hpp>
 #include "DatabaseModels.hpp"
-#include "SpacetimeDB/WebSocket/WebSocketClient.hpp"
+#include "Http/WebSocket/WebSocketClient.hpp"
 
 namespace SpacetimeDB {
 
@@ -21,7 +21,7 @@ namespace SpacetimeDB {
         ///  - a valid JWT token to use for auth.
         ///
         explicit DatabaseClient(
-            const Utils::HttpClient& http,
+            const HttpClient& http,
             WebSocketClient& WebSocket,
             const std::string & token);
         ~DatabaseClient();
@@ -30,9 +30,9 @@ namespace SpacetimeDB {
         /// Execute raw SQL via POST /v1/database/{module}/sql
         /// Returns the parsed JSON response (e.g., {"rows": [...]} or {"rows_affected": N}).
         ///
-        Utils::Result<Utils::Json> ExecuteSql(const std::string& ModuleName,
+        [[nodiscard]] Result<Json> ExecuteSql(const std::string& ModuleName,
                                const std::string& Sql,
-                               const Utils::Json& Params = {}) const;
+                               const Json& Params = {}) const;
 
         ///
         /// Open a WebSocket to ws://…/v1/database/{moduleName}/ws?token={token}.
@@ -41,7 +41,7 @@ namespace SpacetimeDB {
         ///
         void Subscribe(const std::string& ModuleName,
                        const std::string& SqlQuery,
-                       std::function<void(const Utils::Json& event)> OnEvent);
+                       std::function<void(const Json& event)> OnEvent);
 
         ///
         /// Call a reducer over WebSocket:
@@ -49,9 +49,9 @@ namespace SpacetimeDB {
         ///   Block (or asynchronously wait) for a {"type":"ReducerResult",…} frame.
         /// Returns the raw JSON result.
         ///
-        Utils::Result<Utils::Json> CallReducer(const std::string& ModuleName,
+        Result<Json> CallReducer(const std::string& ModuleName,
                                 const std::string& ReducerName,
-                                const Utils::Json& Args);
+                                const Json& Args);
 
         ///
         /// Unsubscribe from an existing subscription by its ID.
@@ -60,7 +60,7 @@ namespace SpacetimeDB {
         void Unsubscribe(const std::string& SubscriptionId) const;
 
     private:
-        const Utils::HttpClient& Http_;
+        const HttpClient& Http_;
         WebSocketClient&         WebSocket_;
         std::string              Token_;
         bool                     WebSocketConnected_;

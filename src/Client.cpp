@@ -1,12 +1,12 @@
 #include "../include/SpacetimeDB/Client.hpp"
 #include "Config.hpp"
-#include "Utils/HttpClient.hpp"
+#include "../include/SpacetimeDB/Http/HttpClient.hpp"
 
 namespace SpacetimeDB {
 
     struct Client::Impl {
         ClientConfig config;
-        Utils::HttpClient http;
+        HttpClient http;
         bool isOpen = true;
     };
 

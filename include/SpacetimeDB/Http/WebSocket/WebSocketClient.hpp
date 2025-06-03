@@ -1,7 +1,7 @@
 #pragma once
 #include <functional>
 #include <string>
-#include "SpacetimeDB/Utils/Json.hpp"
+#include "Http/Json.hpp"
 
 namespace SpacetimeDB {
     ///
@@ -18,11 +18,11 @@ namespace SpacetimeDB {
         static void Connect(const std::string& wsUrl);
 
         /// Send a JSON object (serialized) over the open WebSocket.
-        void Send(const Utils::Json& message);
+        void Send(const Json& message);
 
         /// Register a callback for every incoming JSON frame.
         /// Called on the thread that receives messages.
-        void OnReceive(std::function<void(const Utils::Json&)> callback);
+        void OnReceive(std::function<void(const Json&)> callback);
 
         /// Gracefully close the WebSocket.
         void Close();
@@ -30,7 +30,7 @@ namespace SpacetimeDB {
     private:
      // Internal handle (e.g. std::unique_ptr<websocketpp::client<...>> or Boost::beast::websocket::stream<>)
      // bool isConnected_;
-     // std::function<void(const Utils::Json&)> recvCallback_;
+     // std::function<void(const Json&)> recvCallback_;
  };
 
 } // namespace SpacetimeDB

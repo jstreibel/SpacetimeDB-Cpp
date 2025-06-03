@@ -1,24 +1,24 @@
 #pragma once
 
 // SDK version
-#include "../Version.hpp"
+#include "Version.hpp"
 
 // Core client & config
 #include "Client.hpp"
 #include "Config.hpp"
 
 // Identity service
-#include "../Identity/IdentityClient.hpp"
-#include "../Identity/IdentityModels.hpp"
+#include "Http/Endpoints/Identity/IdentityClient.hpp"
+#include "Http/Endpoints/Identity/IdentityModels.hpp"
 
 // Database service
-#include "../Database/DatabaseClient.hpp"
-#include "../Database/DatabaseModels.hpp"
+#include "Http/Endpoints/Database/DatabaseClient.hpp"
+#include "Http/Endpoints/Database/DatabaseModels.hpp"
 
 // Utilities
-#include "Utils/HttpClientWrapper.hpp"
-#include "Utils/Json.hpp"
-#include "Utils/Error.hpp"
+#include "Http/HttpClient.hpp"
+#include "Http/Json.hpp"
+#include "Http/Error.hpp"
 
 // Schema codegen/runtime
 // #include "Schema/SchemaParser.hpp"

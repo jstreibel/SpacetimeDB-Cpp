@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <string>
-#include <SpacetimeDB/Utils/Json.hpp>
+#include <Http/Json.hpp>
 #include <utility>
 
 namespace SpacetimeDB {
@@ -11,7 +11,7 @@ namespace SpacetimeDB {
     /// -> Generate a new identity and token.
     struct CreateIdentityRequest {
         [[nodiscard]]
-        Utils::Json ToJson() const { return Utils::Json::object(); }
+        Json ToJson() const { return Json::object(); }
         [[nodiscard]]
         std::map<std::string, std::string> GetHeaders() const
         {
@@ -25,7 +25,7 @@ namespace SpacetimeDB {
         std::string Token;  // may be empty if not returned by server
 
         /// Deserialize from the raw JSON response
-        static Utils::Result<IdentityInfo> FromJson(const Utils::Json& JsonData) {
+        static Result<IdentityInfo> FromJson(const Json& JsonData) {
             IdentityInfo Info;
 
             try
@@ -64,7 +64,7 @@ namespace SpacetimeDB {
     struct IdentityWebSocketTokenResponse
     {
         std::string Token;
-        static Utils::Result<IdentityWebSocketTokenResponse> FromJson(const Utils::Json& JsonData)
+        static Result<IdentityWebSocketTokenResponse> FromJson(const Json& JsonData)
         {
             if (!JsonData.contains("token"))
             {
@@ -80,7 +80,7 @@ namespace SpacetimeDB {
     {
         std::vector<std::string> Addresses;
 
-        static Utils::Result<DatabasesInfo> FromJson(const Utils::Json& JsonData) {
+        static Result<DatabasesInfo> FromJson(const Json& JsonData) {
             DatabasesInfo Info;
 
             /* According to SpacetimeDB DOCS:
@@ -115,7 +115,7 @@ namespace SpacetimeDB {
     {
         std::string Data;
 
-        static Utils::Result<GetPublicKeyResponse> FromPemCertificateChain(const std::string& Data) {
+        static Result<GetPublicKeyResponse> FromPemCertificateChain(const std::string& Data) {
             return GetPublicKeyResponse{Data};
         }
     };
@@ -128,8 +128,8 @@ namespace SpacetimeDB {
         std::string Email;
         std::string AuthorizationToken;
 
-        [[nodiscard]] Utils::Json ToJson() const {
-            return Utils::Json{{"email", Email}};
+        [[nodiscard]] Json ToJson() const {
+            return Json{{"email", Email}};
         }
 
         [[nodiscard]] std::map<std::string, std::string> GetHeaders() const {

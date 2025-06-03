@@ -1,20 +1,18 @@
-#include "SpacetimeDB/Utils/HttpClient.hpp"
+#include "../../include/SpacetimeDB/Http/HttpClient.hpp"
 
 #include <iostream>
 #include <cpr/cpr.h>          // Example: using libcpr for HTTP
 #include <stdexcept>
 
 namespace SpacetimeDB {
-    Utils::HttpClient::HttpClient(std::string baseUrl, int timeoutMs)
+    HttpClient::HttpClient(std::string baseUrl, int timeoutMs)
       : baseUrl_(std::move(baseUrl)), timeoutMs_(timeoutMs) {
         // Optionally configure cpr::Session here
     }
 
-    Utils::HttpClient::~HttpClient() {
-        // Cleanup if needed
-    }
+    HttpClient::~HttpClient() = default;
 
-    Utils::Result<Utils::HttpResponse> Utils::HttpClient::Get(const std::string& Path,
+    Result<HttpResponse> HttpClient::Get(const std::string& Path,
                                                               const std::map<std::string, std::string>& Headers) const
     {
         const auto Url = baseUrl_ + Path;
@@ -32,7 +30,7 @@ namespace SpacetimeDB {
         return HttpResponse{ Response.status_code, Response.text };
     }
 
-    Utils::Result<Utils::HttpResponse> Utils::HttpClient::Post(
+    Result<HttpResponse> HttpClient::Post(
         const std::string& Path,
         const std::string& Body,
         const std::map<std::string, std::string>& Headers
@@ -54,7 +52,7 @@ namespace SpacetimeDB {
         return HttpResponse{ Response.status_code, Response.text };
     }
 
-    std::string Utils::HttpClient::GetUrl(const std::string& Path) const
+    std::string HttpClient::GetUrl(const std::string& Path) const
     {
         return baseUrl_ + Path;
     }

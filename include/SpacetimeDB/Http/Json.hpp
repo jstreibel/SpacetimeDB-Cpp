@@ -2,8 +2,8 @@
 
 #include <nlohmann/json.hpp>
 
-namespace SpacetimeDB::Utils {
+namespace SpacetimeDB {
 
     using Json = nlohmann::json;
 
-} // namespace SpacetimeDb::Utils
+} // namespace SpacetimeDb
