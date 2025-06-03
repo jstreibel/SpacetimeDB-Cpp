@@ -131,8 +131,7 @@ int main() {
             std::cerr << "[Identity] failed to verify identity: " << Error << "\n";
             return 1;
         }
-        const auto [Status] = SpacetimeDB::Utils::GetResult(IdVerificationResult);
-        switch (Status)
+        switch (const auto [Status] = SpacetimeDB::Utils::GetResult(IdVerificationResult); Status)
         {
             case SpacetimeDB::VerifyIdentityResponse::ValidMatch:
                 std::cout << "[Identity] identity verification succeeded: ID and token match.\n";

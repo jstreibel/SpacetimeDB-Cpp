@@ -166,12 +166,12 @@ namespace SpacetimeDB {
                 Request.GetHeaders());
         if (!Utils::IsValid(HttpGetResult))
         {
-            ReturnError("Failed to GET " + Path + ": " + Utils::GetErrorMessage(HttpGetResult));
+            ReturnError("Failed to POST " + Path + ": " + Utils::GetErrorMessage(HttpGetResult));
         }
 
         if (const auto [StatusCode, Body] = Utils::GetResult(HttpGetResult); StatusCode != 200)
         {
-            ReturnError("Unhandled status code: " + std::to_string(StatusCode) + " for GET method on Url " + http_.GetUrl(Path));
+            ReturnError("Unhandled status code: " + std::to_string(StatusCode) + " for POST method on Url " + http_.GetUrl(Path));
         }
 
         return {};

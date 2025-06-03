@@ -150,7 +150,7 @@ namespace SpacetimeDB {
         }
 
         [[nodiscard]] std::map<std::string, std::string> GetHeaders() const {
-            return {{"Authorization", AuthorizationToken}};
+            return {{"Authorization", "Bearer " + AuthorizationToken}};
         }
     };
 
@@ -165,7 +165,7 @@ namespace SpacetimeDB {
 
         [[nodiscard]] std::map<std::string, std::string> GetHeaders() const
         {
-            return {{"Authorization", IdentityToVerify.Token}};
+            return {{"Authorization", "Bearer " + IdentityToVerify.Token}};
         }
     };
 

@@ -1,3 +1,5 @@
+#define CATCH_CONFIG_MAIN
+
 #include <catch2/catch.hpp>
 
 #include "SpacetimeDB/Identity/IdentityClient.hpp"
@@ -20,15 +22,29 @@ struct FakeHttp {
 };
 
 TEST_CASE("IdentityClient::Login formats request correctly", "[Identity]") {
-    SpacetimeDB::Utils::HttpClient httpWrapper{};
-    SpacetimeDB::IdentityClient client(httpWrapper);
+    // SpacetimeDB::Utils::HttpClient httpWrapper{};
+    // SpacetimeDB::IdentityClient client(httpWrapper);
 
-    /*
-    auto resp = client.Login("alice", "secret");
+    SpacetimeDB::Utils::HttpClient Http("http://localhost:3000", /*timeoutMs=*/30000);
 
-    REQUIRE(fake.lastPath == "/identity/login");
-    REQUIRE(fake.lastPayload.find("\"username\":\"alice\"") != std::string::npos);
-    REQUIRE(fake.lastHeaders.at("Content-Type") == "application/json");
-    REQUIRE(resp["status"] == "ok");
-    */
+    const SpacetimeDB::IdentityClient IdClient(Http);
+
+    // POST /v1/identity
+    const auto IdentityResult = IdClient.CreateIdentity();
+    REQUIRE(SpacetimeDB::Utils::IsValid(IdentityResult));
+    const auto Identity = SpacetimeDB::Utils::GetResult(IdentityResult);
+
+    // GET /v1/identity/public-key
+    auto PublicKeyResult = IdClient.GetPublicKey();
+    REQUIRE(SpacetimeDB::Utils::IsValid(PublicKeyResult));
+
+    // GET /v1/identity/:identity/databases
+    const auto [Data] = SpacetimeDB::Utils::GetResult(PublicKeyResult);
+    const auto ClientDatabasesResult = IdClient.GetDatabases(Identity.Id);
+    REQUIRE(SpacetimeDB::Utils::IsValid(ClientDatabasesResult));
+
+    // GET /v1/identity/:identity/verify
+    auto VerifyIdResult = IdClient.VerifyIdentity(SpacetimeDB::VerifyIdentityRequest{Identity});
+    REQUIRE(SpacetimeDB::Utils::IsValid(VerifyIdResult));
+    REQUIRE(SpacetimeDB::Utils::GetResult(VerifyIdResult).Status == SpacetimeDB::VerifyIdentityResponse::ValidMatch);
 }
