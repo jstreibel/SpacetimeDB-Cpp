@@ -18,14 +18,10 @@ A modern, header-only (plus a small .cpp core) C++ client for SpacetimeDB, with 
 - [x] **Json** alias (`using Json = nlohmann::json;`)
 - [x] **Config** & **Client** classes with Builder pattern
 - [x] **Umbrella header** (`SpacetimeDB.hpp`) and `version.hpp`
-- [x] **IdentityClient** + **IdentityModels** (`CreateIdentityRequest`, `IdentityInfo`)
+- [x] **IdentityClient** + **IdentityModels** (`CreateIdentityRequest`, `IdentityInfo`, etc)
 - [ ] **DatabaseClient** + **DatabaseModels** (`ExecuteSqlRequest`, `ExecuteSqlResponse`, `PublishDocumentRequest`)
 - [ ] **Examples** (`quickstart.cpp`, `subscribe.cpp`)
 - [ ] **Tests** (`IdentityTests.cpp`, `DatabaseTests.cpp`, `UtilsTests.cpp`)
-
-- [ ] **Error handling**
-    - Throw or return a `SpacetimeError` on non-2xx HTTP responses or JSON errors
-    - Define `enum class ErrorCode` and exception types in `Utils/Error.hpp`
 - [ ] **Internal APIs**
     - Move implementation-only helpers into `SpacetimeDb::detail` namespace
     - Consider **Pimpl** in public classes for ABI stability
@@ -34,6 +30,8 @@ A modern, header-only (plus a small .cpp core) C++ client for SpacetimeDB, with 
 - [ ] **CMake install & export**
     - Add `install(TARGETS … EXPORT …)`
     - Generate `SpacetimeDbSdkConfig.cmake` for `find_package(SpacetimeDbSdk CONFIG)`
+- [ ] **Schema codegen integration**
+    - Add `tools/CodegenTool` to generate `include/Schema/Generated/` from `GET /v1/database/{database}/schema`
 - [ ] **Schema codegen integration**
     - Hook `tools/CodegenTool` into the build so that `include/Schema/Generated/` is always up-to-date
 - [ ] **WebSocket client**
