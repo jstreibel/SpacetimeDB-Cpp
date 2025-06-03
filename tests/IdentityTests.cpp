@@ -34,6 +34,10 @@ TEST_CASE("IdentityClient::Login formats request correctly", "[Identity]") {
     REQUIRE(SpacetimeDB::Utils::IsValid(IdentityResult));
     const auto Identity = SpacetimeDB::Utils::GetResult(IdentityResult);
 
+    // POST /v1/identity/websocket-token
+    const auto WSTokenResult = IdClient.GetWebSocketToken(SpacetimeDB::GetIdentityWebSocketTokenRequest(Identity.Token));
+    REQUIRE(SpacetimeDB::Utils::IsValid(WSTokenResult));
+
     // GET /v1/identity/public-key
     auto PublicKeyResult = IdClient.GetPublicKey();
     REQUIRE(SpacetimeDB::Utils::IsValid(PublicKeyResult));

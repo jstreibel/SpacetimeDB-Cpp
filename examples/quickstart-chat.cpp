@@ -79,6 +79,18 @@ int main() {
         std::cout << "[Identity] generated ID: " << Identity.Id << "\n";
 
 
+        auto WebSocketRequest = SpacetimeDB::GetIdentityWebSocketTokenRequest{Identity.Token};
+        const auto ShortTokenResult = IdClient.GetWebSocketToken(WebSocketRequest);
+        if (!SpacetimeDB::Utils::IsValid(ShortTokenResult))
+        {
+            const auto Error = SpacetimeDB::Utils::GetErrorMessage(ShortTokenResult);
+            std::cerr << "[Identity] failed to get websocket token: " << Error << "\n";
+            return 1;
+        }
+        const auto [ShortLivedToken] = SpacetimeDB::Utils::GetResult(ShortTokenResult);
+        std::cout << "[Identity] got websocket token: " << ShortLivedToken << "\n";
+
+
         auto PublicKeyResult = IdClient.GetPublicKey();
         if (!SpacetimeDB::Utils::IsValid(PublicKeyResult))
         {
@@ -97,13 +109,13 @@ int main() {
             std::cerr << "[Identity] failed to get databases: " << Error << "\n";
             return 1;
         }
-        const auto Databases = SpacetimeDB::Utils::GetResult(ClientDatabasesResult);
+        const auto [Addresses] = SpacetimeDB::Utils::GetResult(ClientDatabasesResult);
         std::cout << "[Identity] received databases addresses for generated ID: ";
-        if (Databases.Addresses.empty())
+        if (Addresses.empty())
         {
             std::cout << "none\n";
         }
-        else for (const auto& Address : Databases.Addresses)
+        else for (const auto& Address : Addresses)
         {
             std::cout << "'" << Address << "'; ";
         }

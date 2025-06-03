@@ -15,8 +15,7 @@ namespace SpacetimeDB {
         [[nodiscard]]
         std::map<std::string, std::string> GetHeaders() const
         {
-            // return {{"Content-Type", "application/json"}};
-            return {};
+            return {{"Content-Type", "application/json"}};
         }
     };
 
@@ -51,13 +50,13 @@ namespace SpacetimeDB {
 
         explicit GetIdentityWebSocketTokenRequest(std::string Token) : Token(std::move(Token)) {}
 
-        std::map<std::string, std::string> GetHeaders() const { return {{"Authorization", Token}}; }
-
-        [[nodiscard]] static Utils::Json ToJson(const GetIdentityWebSocketTokenRequest& Request)
+        std::map<std::string, std::string> GetHeaders() const
         {
-            return Utils::Json::object();
+            return {
+                {"Authorization", "Bearer " + Token},
+                {"Content-Type", "application/json"}
+            };
         }
-
         
     };
 
@@ -75,14 +74,6 @@ namespace SpacetimeDB {
         }
     };
 
-
-    /// Request payload for GET /v1/identity/{id}/databases
-    /// -> List databases owned by an identity.
-    struct ListOwnedDatabasesRequest {
-        [[nodiscard]] Utils::Json ToJson() {
-            return Utils::Json::object();
-        }
-    };
 
     /// Response payload for GET /v1/identity/{id}/databases
     struct DatabasesInfo
@@ -120,14 +111,6 @@ namespace SpacetimeDB {
 
     /// GET /v1/identity/public-key	Get the public key used for verifying tokens.
     /// Returns a response of content-type application/pem-certificate-chain.
-    struct GetPublicKeyRequest
-    {
-        [[nodiscard]] std::map<std::string, std::string> GetHeaders() const {
-            // return {{"Content-Type", "application/pem-certificate-chain"}};
-            return {};
-        }
-    };
-
     struct GetPublicKeyResponse
     {
         std::string Data;

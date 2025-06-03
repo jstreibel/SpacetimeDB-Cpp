@@ -13,6 +13,10 @@ namespace SpacetimeDB::Utils {
     #define ReturnError(Message) \
         return SpacetimeDB::Utils::ErrorType("Location " + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "\n\tMessage: \"" + (Message) + "\"")
 
+    #define OnError(CallResult, Message) \
+        if (!SpacetimeDB::Utils::IsValid(CallResult)) ReturnError(Message);
+
+
     template<typename RETURN_TYPE>
     std::string GetErrorMessage(Result<RETURN_TYPE> SomeReturnedValue)
     {

@@ -31,8 +31,7 @@ namespace SpacetimeDB {
         [[nodiscard]] Utils::Result<IdentityWebSocketTokenResponse> GetWebSocketToken(
             const GetIdentityWebSocketTokenRequest& Request) const;
 
-        [[nodiscard]] Utils::Result<GetPublicKeyResponse> GetPublicKey(
-            const GetPublicKeyRequest& Request = GetPublicKeyRequest()) const;
+        [[nodiscard]] Utils::Result<GetPublicKeyResponse> GetPublicKey( ) const;
 
         ///
         /// List databases owned by an identity via GET /v1/identity/{identityId}/databases.

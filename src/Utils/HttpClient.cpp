@@ -18,32 +18,34 @@ namespace SpacetimeDB {
                                                               const std::map<std::string, std::string>& Headers) const
     {
         const auto Url = baseUrl_ + Path;
+
         cpr::Session Session;
         Session.SetUrl(cpr::Url{Url});
         Session.SetTimeout(timeoutMs_);
-        for (auto& [k,v] : Headers) {
-            Session.SetHeader({{k, v}});
-        }
+        Session.SetHeader({Headers.begin(), Headers.end()});
+
         const auto Response = Session.Get();
         if (Response.error) {
             ReturnError("HTTP GET error: " + Response.error.message);
         }
+
         return HttpResponse{ Response.status_code, Response.text };
     }
 
-    Utils::Result<Utils::HttpResponse> Utils::HttpClient::Post(const std::string& Path,
-                                                const std::string& Body,
-                                                const std::map<std::string, std::string>& Headers) const
+    Utils::Result<Utils::HttpResponse> Utils::HttpClient::Post(
+        const std::string& Path,
+        const std::string& Body,
+        const std::map<std::string, std::string>& Headers
+    ) const
     {
         const auto Url = GetUrl(Path);
+
         cpr::Session Session;
         Session.SetUrl(cpr::Url{Url});
         Session.SetTimeout(timeoutMs_);
-        for (auto& [Key,Value] : Headers) {
-            Session.SetHeader({{Key, Value}});
-        }
+        Session.SetHeader(cpr::Header{Headers.begin(), Headers.end()});
         Session.SetBody(cpr::Body{Body});
-        Session.SetHeader(cpr::Header{{"Content-Type", "application/json"}});
+
         const auto Response = Session.Post();
         if (Response.error) {
             ReturnError("HTTP POST error: " + Response.error.message);

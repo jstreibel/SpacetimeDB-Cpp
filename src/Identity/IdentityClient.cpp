@@ -84,13 +84,10 @@ namespace SpacetimeDB {
         // GET /identity/{id}/databases
         const auto Path = "/v1/identity/" + IdentityId + "/databases";
         const auto HttpGetResult = http_.Get(Path, {});
-        if (!Utils::IsValid(HttpGetResult))
-        {
-            ReturnError("Failed to GET " + Path + ": " + Utils::GetErrorMessage(HttpGetResult));
-        }
+
+        OnError(HttpGetResult, "Failed to GET " + Path + ": " + Utils::GetErrorMessage(HttpGetResult));
 
         const auto [StatusCode, Body] = Utils::GetResult(HttpGetResult);
-
         if (StatusCode != 200)
         {
             ReturnError("Unhandled status code: " + std::to_string(StatusCode) + " for GET method on Url " + http_.GetUrl(Path));
@@ -111,38 +108,33 @@ namespace SpacetimeDB {
     Utils::Result<IdentityWebSocketTokenResponse> IdentityClient::GetWebSocketToken(
         const GetIdentityWebSocketTokenRequest& Request) const
     {
-        const auto Path = std::string("/v1/websocket-token");
+        const auto Path = std::string("/v1/identity/websocket-token");
+        const auto Headers = Request.GetHeaders();
+
         const auto HttpGetResult =
             http_.Post(
                 Path,
-                Utils::Json(),
-                Request.GetHeaders());
-        if (!Utils::IsValid(HttpGetResult))
-        {
-            ReturnError("Failed to GET " + Path + ": " + Utils::GetErrorMessage(HttpGetResult));
-        }
+                Utils::Json().dump(),
+                Headers);
+        OnError(HttpGetResult, "Failed to POST " + Path + ": " + Utils::GetErrorMessage(HttpGetResult));
 
         const auto [StatusCode, Body] = Utils::GetResult(HttpGetResult);
 
         if (StatusCode != 200)
         {
-            ReturnError("Unhandled status code: " + std::to_string(StatusCode) + " for GET method on Url " + http_.GetUrl(Path));
+            ReturnError("Unhandled status code: " + std::to_string(StatusCode) + " for POST method on Url " + http_.GetUrl(Path));
         }
 
-        return IdentityWebSocketTokenResponse::FromJson(Body);
+        const Utils::Json JsonResponse = Utils::Json::parse(Body);
+        return IdentityWebSocketTokenResponse::FromJson(JsonResponse);
     }
 
-    Utils::Result<GetPublicKeyResponse> IdentityClient::GetPublicKey(const GetPublicKeyRequest& Request) const
+    Utils::Result<GetPublicKeyResponse> IdentityClient::GetPublicKey( ) const
     {
         const auto Path = std::string("/v1/identity/public-key");
-        const auto HttpGetResult =
-            http_.Get(
-                Path,
-                Request.GetHeaders());
-        if (!Utils::IsValid(HttpGetResult))
-        {
-            ReturnError("Failed to GET " + Path + ": " + Utils::GetErrorMessage(HttpGetResult));
-        }
+        const auto HttpGetResult = http_.Get(Path,{});
+
+        OnError(HttpGetResult, "Failed to GET " + Path + ": " + Utils::GetErrorMessage(HttpGetResult));
 
         const auto [StatusCode, Body] = Utils::GetResult(HttpGetResult);
 
@@ -154,20 +146,12 @@ namespace SpacetimeDB {
         return GetPublicKeyResponse::FromPemCertificateChain(Body);
     }
 
-    Utils::Result<SetEmailResponse> IdentityClient::SetEmail(
-        const std::string& IdentityId,
-        const SetEmailRequest& Request) const
+    Utils::Result<SetEmailResponse> IdentityClient::SetEmail(const std::string& IdentityId, const SetEmailRequest& Request) const
     {
         const auto Path = std::string("/v1/identity/") + IdentityId + "/set-email";
-        const auto HttpGetResult =
-            http_.Post(
-                Path,
-                Request.ToJson().dump(),
-                Request.GetHeaders());
-        if (!Utils::IsValid(HttpGetResult))
-        {
-            ReturnError("Failed to POST " + Path + ": " + Utils::GetErrorMessage(HttpGetResult));
-        }
+        const auto HttpGetResult = http_.Post(Path, Request.ToJson().dump(), Request.GetHeaders());
+
+        OnError(HttpGetResult, "Failed to POST " + Path + ": " + Utils::GetErrorMessage(HttpGetResult));
 
         if (const auto [StatusCode, Body] = Utils::GetResult(HttpGetResult); StatusCode != 200)
         {
@@ -180,21 +164,15 @@ namespace SpacetimeDB {
     Utils::Result<VerifyIdentityResponse> IdentityClient::VerifyIdentity(const VerifyIdentityRequest& Request) const
     {
         const auto Path = "/v1/identity/" + Request.IdentityToVerify.Id + "/verify";
-        const auto HttpGetResult =
-            http_.Get(
-                Path,
-                Request.GetHeaders());
-        if (!Utils::IsValid(HttpGetResult))
-        {
-            ReturnError("Failed to GET " + Path + ": " + Utils::GetErrorMessage(HttpGetResult));
-        }
+        const auto HttpGetResult = http_.Get(Path, Request.GetHeaders());
+        OnError(HttpGetResult, "Failed to GET " + Path + ": " + Utils::GetErrorMessage(HttpGetResult));
 
         const auto [StatusCode, Body] = Utils::GetResult(HttpGetResult);
         if (StatusCode == 204)  return VerifyIdentityResponse{VerifyIdentityResponse::ValidMatch};
         if (StatusCode == 400)  return VerifyIdentityResponse{VerifyIdentityResponse::ValidMismatch};
         if (StatusCode == 401)  return VerifyIdentityResponse{VerifyIdentityResponse::InvalidOrNoAuthorizationToken};
 
-        ReturnError("Unhandled status code: "
-            + std::to_string(StatusCode) + " for GET method on Url " + http_.GetUrl(Path));
+        ReturnError(
+            "Unhandled status code: " + std::to_string(StatusCode) + " for GET method on Url " + http_.GetUrl(Path));
     }
 } // namespace SpacetimeDb
