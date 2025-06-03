@@ -111,14 +111,8 @@ int main() {
         }
         const auto [Addresses] = SpacetimeDB::Utils::GetResult(ClientDatabasesResult);
         std::cout << "[Identity] received databases addresses for generated ID: ";
-        if (Addresses.empty())
-        {
-            std::cout << "none\n";
-        }
-        else for (const auto& Address : Addresses)
-        {
-            std::cout << "'" << Address << "'; ";
-        }
+        if (Addresses.empty()) std::cout << "none\n";
+        else for (const auto& Address : Addresses) std::cout << "'" << Address << "'; ";
 
 
         /*
@@ -157,7 +151,6 @@ int main() {
         }
 
 
-        return -1;
 
         // ---- 3.4 Prepare a WebSocket client and a DatabaseClient for the “chat” module
         SpacetimeDB::WebSocketClient WebSocketClient;
