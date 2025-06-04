@@ -1,6 +1,6 @@
 # SpacetimeDB C++ SDK
 
-> ⚠️ **Early-stage — not all is functional!**
+> ⚠️ **Early-stage**
 
 A modern, header-only (plus a small .cpp core) C++ client for SpacetimeDB, with HTTP, JSON and WebSocket 
 support out of the box.
@@ -10,7 +10,7 @@ support out of the box.
 - Version: **0.1.0**  
 - Library: `SpacetimeDbSdk` (static)  
 - Dependencies: [libcpr](https://github.com/libcpr/cpr) (HTTP), [nlohmann/json](https://github.com/nlohmann/json) (JSON)  
-- ⚠️ **This SDK is very early-stage** and **not yet functional**—many pieces still need implementation, wiring and testing.
+- ⚠️ **This SDK is very early-stage** many pieces still need implementation, wiring and testing.
 
 ## 👹 Backlog
 
