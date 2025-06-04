@@ -5,6 +5,7 @@
 
 #include "Error.hpp"
 #include "Json.hpp"
+#include "../../../cmake-build-release/_deps/catch2-src/single_include/catch2/catch.hpp"
 
 #define HTTP_METHOD_SIGNATURE(METHOD_NAME) \
     [[nodiscard]] Result<Response::METHOD_NAME> METHOD_NAME(const Request::METHOD_NAME&) const;
@@ -26,7 +27,7 @@ namespace SpacetimeDB {
         HttpRequest(SpacetimeToken Bearer, String ContentType)  : Bearer(Bearer), ContentType(ContentType) {}
 
         virtual ~HttpRequest() = default;
-        [[nodiscard]] virtual String GetBody()   const { return {}; }
+        [[nodiscard]] virtual String GetBody()   const { return "{}"; }
         [[nodiscard]] virtual Header GetHeader() const
         {
             Header Head;
@@ -34,13 +35,21 @@ namespace SpacetimeDB {
             if (ContentType.has_value()) Head["Content-Type"] = ContentType.value();
             return Head;
         }
-        [[nodiscard]] virtual Json AsJson() const { return GetBody(); }
+        [[nodiscard]] virtual StringMap GetParameters() const { return {}; }
     };
 
     /// A minimal HTTP response wrapper
     struct HttpResponse {
+        // TODO make sure whats below is always filled
         long     StatusCode;
         String   Body;
+
+        HttpResponse() = default;
+        explicit HttpResponse(const cpr::Response &Response)
+        : HttpResponse(Response.status_code, Response.text) { }
+        HttpResponse(const long StatusCode, String Body)
+        : StatusCode(StatusCode), Body(std::move(Body)) { }
+
     };
 
     /**
@@ -68,7 +77,7 @@ namespace SpacetimeDB {
 
         cpr::Response Delete(const String& Path, const HttpRequest& Head) const;
 
-        [[nodiscard]] String GetUrl(const String &Path) const;
+        [[nodiscard]] String GetUrl(const String &Path, StringMap Parameters={}) const;
 
         [[nodiscard]] String GetBaseUrl() const { return BaseUrl; }
     private:

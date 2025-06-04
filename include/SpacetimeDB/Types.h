@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <optional>
+#include <map>
 #include <variant>
 
 namespace SpacetimeDB
@@ -17,8 +18,12 @@ namespace SpacetimeDB
     using HexString = std::string;
     using SpacetimeToken = std::string;
 
+    template <typename T>
+    String ToString(T Val) { return std::to_string(Val); }
+
     using Int = int32_t;
     using Milliseconds = Int;
+    using StringMap = std::map<String, String>;
 
     template <typename T>
     using Array = std::vector<T>;

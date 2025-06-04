@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <future>
 #include <utility>
+#include <boost/asio/ip/basic_resolver_iterator.hpp>
 
 namespace SpacetimeDB::Database {
 
@@ -76,12 +77,32 @@ namespace SpacetimeDB::Database {
 
     Result<Response::CallReducer> Client::CallReducer(const Request::CallReducer& Request) const
     {
-        ReturnError("Not implemented");
+        const auto Reducer = Request.Reducer;
+
+        const String Endpoint = DatabaseEndpoint + "/" + NameOrIdentity + "/call/";
+        if (const auto HttpResponse = Delete(Endpoint, Request); HttpResponse.error)
+        {
+            ReturnError("HTTP POST error: " + HttpResponse.error.message);
+        }
+
+        return Response::CallReducer{};
     }
 
     Result<Response::GetSchema> Client::GetSchema(const Request::GetSchema& Request) const
     {
-        ReturnError("Not implemented");
+        const String Endpoint = DatabaseEndpoint + "/" + NameOrIdentity + "/schema";
+        const auto HttpResponse = Get(Endpoint, Request);
+        if (HttpResponse.error)
+        {
+            ReturnError("HTTP GET error: " + HttpResponse.error.message);
+        }
+
+        Response::GetSchema Response{};
+        Response.StatusCode = HttpResponse.status_code;
+        Response.Body = HttpResponse.text;
+        Response.RawModuleDef = Json::parse(HttpResponse.text);
+
+        return Response;
     }
 
     Result<Response::GetLogs> Client::GetLogs(const Request::GetLogs& Request) const

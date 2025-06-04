@@ -169,9 +169,19 @@ int main() {
         std::cout << "[Database] got description for 'quickstart-chatty-chat': " << "\n"
             << "\tIdentity: " << Description.Identity << "\n"
             << "\tOwner Identity: " << Description.OwnerIdentity << "\n"
-            << "\tToken: " << Description.HostType << "\n"
+            << "\tHost Type: " << Description.HostType << "\n"
             << "\tHash: " << Description.InitialWasmHash << std::endl;
 
+
+        const auto SchemaResult = DatabaseClient.GetSchema();
+        if (!SpacetimeDB::IsValid(SchemaResult))
+        {
+            const auto Error = SpacetimeDB::GetErrorMessage(SchemaResult);
+            std::cerr << "[Database] failed to get schema: " << Error << "\n";
+        }
+        const auto& Schema = SpacetimeDB::GetResult(SchemaResult);
+        std::cout << "[Database] got schema for 'quickstart-chatty-chat': \n";
+        std::cout << Schema.RawModuleDef << std::endl;
 
         // ---- 3.4 Prepare a WebSocket client and a DatabaseClient for the “chat” module
         SpacetimeDB::WebSocketClient WebSocketClient;

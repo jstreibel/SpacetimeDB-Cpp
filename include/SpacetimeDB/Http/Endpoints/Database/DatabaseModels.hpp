@@ -15,15 +15,15 @@ namespace SpacetimeDB::Database {
 
         struct GetDescription final : HttpRequest { };
 
-        struct DeleteDB         final : HttpRequest
+        struct DeleteDB       final : HttpRequest
         {
             DeleteDB() = delete;
             explicit DeleteDB(const SpacetimeToken& Bearer) : HttpRequest(Bearer) { }
         };
 
-        struct GetNames final : HttpRequest { };
+        struct GetNames       final : HttpRequest { };
 
-        struct AddName  final : HttpRequest
+        struct AddName        final : HttpRequest
         {
             String NewName;
 
@@ -34,9 +34,10 @@ namespace SpacetimeDB::Database {
             [[nodiscard]] String GetBody() const override { return NewName; }
         };
 
-        struct SetNames final : HttpRequest
+        struct SetNames       final : HttpRequest
         {
             Array<String> NewNames;
+
             SetNames() = delete;
             explicit SetNames(const SpacetimeToken& Bearer, const Array<String>& NewNames)
             : HttpRequest(Bearer), NewNames(NewNames) { }
@@ -44,17 +45,35 @@ namespace SpacetimeDB::Database {
             [[nodiscard]] String GetBody() const override { return Json(NewNames).dump(); }
         };
 
-        struct GetIdentity final : HttpRequest { };
+        struct GetIdentity    final : HttpRequest { };
 
-        struct Subscribe final : HttpRequest {};
+        struct Subscribe      final : HttpRequest {};
 
-        struct CallReducer final : HttpRequest {};
+        struct CallReducer    final : HttpRequest
+        {
+            String Reducer;
+            Json SatsArgs;
 
-        struct GetSchema final : HttpRequest {};
+            CallReducer() = delete;
+            CallReducer(const SpacetimeToken& Bearer, String Reducer, Json SatsArgs)
+            : HttpRequest(Bearer), Reducer(std::move(Reducer)), SatsArgs(std::move(SatsArgs)) { }
 
-        struct GetLogs final : HttpRequest {};
+            [[nodiscard]] String GetBody() const override { return SatsArgs.dump(); }
+        };
 
-        struct ExecuteSql final : HttpRequest
+        struct GetSchema      final : HttpRequest
+        {
+            Int Version = 9;
+
+            [[nodiscard]] StringMap GetParameters() const override
+            {
+                return {{"version", ToString(Version)}};
+            };
+        };
+
+        struct GetLogs        final : HttpRequest {};
+
+        struct ExecuteSql     final : HttpRequest
         {
 
         };
@@ -62,9 +81,9 @@ namespace SpacetimeDB::Database {
 
     namespace Response
     {
-        struct PublishNew final : HttpResponse { };
+        struct PublishNew     final : HttpResponse { };
 
-        struct PublishTo  final : HttpResponse { };
+        struct PublishTo      final : HttpResponse { };
 
         struct GetDescription final : HttpResponse
         {
@@ -103,14 +122,14 @@ namespace SpacetimeDB::Database {
             }
         };
 
-        struct DeleteDB final : HttpResponse { };
+        struct DeleteDB       final : HttpResponse { };
 
-        struct GetNames final : HttpRequest
+        struct GetNames       final : HttpRequest
         {
             Array<String> Names;
         };
 
-        struct AddName final : HttpResponse
+        struct AddName        final : HttpResponse
         {
 
             enum {Success, PermissionDenied, Invalid} Status;
@@ -120,22 +139,25 @@ namespace SpacetimeDB::Database {
 
         };
 
-        struct SetNames final : HttpResponse { };
+        struct SetNames       final : HttpResponse { };
 
-        struct GetIdentity final : HttpResponse
+        struct GetIdentity    final : HttpResponse
         {
             HexString Identity;
         };
 
-        struct Subscribe final : HttpResponse { };
+        struct Subscribe      final : HttpResponse { };
 
-        struct CallReducer final : HttpResponse { };
+        struct CallReducer    final : HttpResponse { };
 
-        struct GetSchema final : HttpResponse { };
+        struct GetSchema      final : HttpResponse
+        {
+            Json RawModuleDef;
+        };
 
-        struct GetLogs final : HttpResponse { };
+        struct GetLogs        final : HttpResponse { };
 
-        struct ExecuteSql final : HttpResponse { };
+        struct ExecuteSql     final : HttpResponse { };
     }
 
 

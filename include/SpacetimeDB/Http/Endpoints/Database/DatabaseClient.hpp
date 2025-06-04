@@ -72,7 +72,7 @@ namespace SpacetimeDB::Database {
 
         /// GET /v1/database/:name_or_identity/schema
         /// Get the schema for a database.
-        HTTP_METHOD_SIGNATURE(GetSchema)
+        [[nodiscard]] Result<Response::GetSchema> GetSchema(const Request::GetSchema& Request = {}) const;
 
         /// GET /v1/database/:name_or_identity/logs
         /// Retrieve logs from a database.

@@ -14,13 +14,14 @@ namespace SpacetimeDB {
 
     HttpClient::~HttpClient() = default;
 
-    cpr::Response HttpClient::Get(const String &Endpoint, const HttpRequest& Request) const
+    cpr::Response HttpClient::Get(const String &Path, const HttpRequest& Request) const
     {
-        const auto Url = GetUrl(Endpoint);
+        const auto Url = GetUrl(Path, Request.GetParameters());
 
         cpr::Session Session;
         Session.SetUrl(Url);
         Session.SetTimeout(timeoutMs_);
+        Session.SetBody(Request.GetBody());
         Session.SetHeader(Request.GetHeader());
 
         return Session.Get();
@@ -78,8 +79,15 @@ namespace SpacetimeDB {
     }
 
 
-    std::string HttpClient::GetUrl(const std::string& Path) const
+    std::string HttpClient::GetUrl(const std::string& Path, StringMap Parameters) const
     {
-        return BaseUrl + Path;
+        auto Url = BaseUrl + Path;
+
+        for (const auto& [Key, Value] : Parameters)
+        {
+            Url += "?" + Key + "=" + Value;
+        }
+
+        return Url;
     }
 } // namespace SpacetimeDB
