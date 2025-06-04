@@ -5,7 +5,6 @@
 
 #include "Error.hpp"
 #include "Json.hpp"
-#include "../../../cmake-build-release/_deps/catch2-src/single_include/catch2/catch.hpp"
 
 #define HTTP_METHOD_SIGNATURE(METHOD_NAME) \
     [[nodiscard]] Result<Response::METHOD_NAME> METHOD_NAME(const Request::METHOD_NAME&) const;
