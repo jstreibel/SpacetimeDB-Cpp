@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.15)
 project(SpacetimeDBSdk VERSION 0.1.0 LANGUAGES CXX)
 
 # Options
-option(STDB_BUILD_EXAMPLES "Build example executables" ON)
-option(STDB_BUILD_TESTS    "Build unit tests"          ON)
+option(STDB_BUILD_EXAMPLES "Build example executables" OFF)
+option(STDB_BUILD_TESTS    "Build unit tests"          OFF)
 
 # C++ standard
 set(CMAKE_CXX_STANDARD 17)
