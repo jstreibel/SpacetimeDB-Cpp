@@ -5,97 +5,80 @@
 
 namespace SpacetimeDB::Database {
 
-    DatabaseClient::DatabaseClient(const HttpClient& http, WebSocketClient& WebSocket, SpacetimeToken Token)
+    Client::Client(const HttpClient& http, WebSocketClient& WebSocket, SpacetimeToken Token)
     : Http_(http), WebSocket_(WebSocket), Token_(std::move(Token)), WebSocketConnected_(false)
     {
 
     }
 
-    DatabaseClient::~DatabaseClient() {
-        // Optionally close the WebSocket if still open
+    Client::~Client() {
+        // Optionally, close the WebSocket if still open
         WebSocket_.Close();
     }
 
-    Result<Json> DatabaseClient::ExecuteSql(const String& ModuleName, const String& Sql, const Json& Params) const
+    Result<Response::PublishNew> Client::PublishNew(const Request::PublishNew& Request) const
     {
-        const std::string Path = "/v1/database/" + ModuleName + "/sql";
-        Json payload = Json::object();
-        payload["sql"] = Sql;
-        if (!Params.is_null()) {
-          payload["params"] = Params;
-        }
-
-        // Build headers
-        Header Head;
-        Head["Authorization"] = "Bearer " + Token_;
-        Head["Content-Type"]  = "application/json";
-
-        const auto PostResult = Http_.Post(Path, payload.dump(), Head);
-        if (!IsValid(PostResult))
-        {
-            const auto Message = GetErrorMessage(PostResult);
-            ReturnError("Failed to POST to " + Path + ": " + Message);
-        }
-        auto [StatusCode, Body] = GetResult(PostResult);
-        if (StatusCode != 200) {
-            ReturnError("SQL failed (status " + std::to_string(StatusCode) + ")");
-        }
-        return Json::parse(Body);
+        ReturnError("Not implemented");
     }
 
-    void DatabaseClient::Subscribe(const std::string& ModuleName,
-                                   const std::string& SqlQuery,
-                                   const std::function<void(const Json& Event)>& OnEvent)
+    Result<Response::PublishTo> Client::PublishTo(const Request::PublishTo& Request) const
     {
-        if (!WebSocketConnected_) {
-            // Build ws:// URL
-            const std::string WebSocketUrl = "ws://localhost:3000/v1/database/" + ModuleName + "/ws?token=" + Token_;
-            WebSocket_.Connect(WebSocketUrl);
-            WebSocketConnected_ = true;
-        }
-
-        // Register the 'receive' callback
-        WebSocket_.OnReceive([OnEvent](const Json& JsonMsg) {
-            // Dispatch only Insert/Update/Delete types; user can inspect "type"
-            OnEvent(JsonMsg);
-        });
-
-        // Send the Subscribe frame
-        Json subMsg = Json::object();
-        subMsg["type"]  = "Subscribe";
-        subMsg["query"] = SqlQuery;
-        WebSocket_.Send(subMsg);
+        ReturnError("Not implemented");
     }
 
-    Result<Json> DatabaseClient::CallReducer(const String& ModuleName, const String& ReducerName, const Json& Args)
+    Result<Response::GetDescription> Client::GetDescription(const Request::GetDescription& Request) const
     {
-        if (!WebSocketConnected_) {
-            const std::string WebSocketUrl = "ws://localhost:3000/v1/database/" + ModuleName + "/ws?token=" + Token_;
-            WebSocket_.Connect(WebSocketUrl);
-            WebSocketConnected_ = true;
-        }
+        ReturnError("Not implemented");
+    }
 
-        // Build the request frame
-        Json Request = Json::object();
-        Request["type"]    = "CallReducer";
-        Request["reducer"] = ReducerName;
-        Request["args"]    = Args;
-        WebSocket_.Send(Request);
+    Result<Response::Delete> Client::Delete(const Request::Delete& Request) const
+    {
+        ReturnError("Not implemented");
+    }
 
-        // Wait for exactly one ReducerResult frame. Use a promise/future for simplicity.
-        std::promise<Json> Promise;
-        std::future<Json> Future = Promise.get_future();
+    Result<Response::GetNames> Client::GetNames(const Request::GetNames& Request) const
+    {
+        ReturnError("Not implemented");
+    }
 
-        WebSocket_.OnReceive([&Promise](const Json& JsonMsg) mutable {
-            if (JsonMsg.contains("type") && JsonMsg["type"] == "ReducerResult") {
-                Promise.set_value(JsonMsg);
-            } else if (JsonMsg.contains("type") && JsonMsg["type"] == "Error") {
-                // TODO: Could set_exception here, but for brevity, set_value with the error object
-                Promise.set_value(JsonMsg);
-            }
-        });
+    Result<Response::AddName> Client::AddName(const Request::AddName& Request) const
+    {
+        ReturnError("Not implemented");
+    }
 
-        return Future.get();  // Blocks until ReducerResult or Error arrives
+    Result<Response::SetNames> Client::SetNames(const Request::SetNames& Request) const
+    {
+        ReturnError("Not implemented");
+    }
+
+    Result<Response::GetIdentity> Client::GetIdentity(const Request::GetIdentity& Request) const
+    {
+        ReturnError("Not implemented");
+    }
+
+    Result<Response::Subscribe> Client::Subscribe(const Request::Subscribe& Request) const
+    {
+        ReturnError("Not implemented");
+    }
+
+    Result<Response::CallReducer> Client::CallReducer(const Request::CallReducer& Request) const
+    {
+        ReturnError("Not implemented");
+    }
+
+    Result<Response::GetSchema> Client::GetSchema(const Request::GetSchema& Request) const
+    {
+        ReturnError("Not implemented");
+    }
+
+    Result<Response::GetLogs> Client::GetLogs(const Request::GetLogs& Request) const
+    {
+        ReturnError("Not implemented");
+    }
+
+    Result<Response::ExecuteSql> Client::ExecuteSql(const Request::ExecuteSql& Request) const
+    {
+        ReturnError("Not implemented");
     }
 
 } // namespace SpacetimeDB

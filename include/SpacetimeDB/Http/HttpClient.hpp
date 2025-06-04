@@ -5,6 +5,12 @@
 #include "Error.hpp"
 #include "Json.hpp"
 
+#define HTTP_METHOD_SIGNATURE(METHOD_NAME) \
+    [[nodiscard]] Result<Response::METHOD_NAME> METHOD_NAME(const Request::METHOD_NAME&) const;
+
+#define HTTP_METHOD_IMPLEMENTATION(METHOD_NAME) \
+    Result<Response::METHOD_NAME> Client::METHOD_NAME(const Request::METHOD_NAME&) const
+
 namespace SpacetimeDB {
     using Header = cpr::Header;
 
@@ -19,15 +25,15 @@ namespace SpacetimeDB {
         HttpRequest(SpacetimeToken Bearer, String ContentType)  : Bearer(Bearer), ContentType(ContentType) {}
 
         virtual ~HttpRequest() = default;
-        virtual String GetBody()   const { return {}; }
-        virtual Header GetHeader() const
+        [[nodiscard]] virtual String GetBody()   const { return {}; }
+        [[nodiscard]] virtual Header GetHeader() const
         {
             Header Head;
             if (Bearer.has_value())      Head["Authorization"] = "Bearer " + Bearer.value();
             if (ContentType.has_value()) Head["Content-Type"] = ContentType.value();
             return Head;
         }
-        virtual Json AsJson() const { return GetBody(); }
+        [[nodiscard]] virtual Json AsJson() const { return GetBody(); }
     };
 
     /// A minimal HTTP response wrapper

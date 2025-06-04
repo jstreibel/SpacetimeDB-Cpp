@@ -13,7 +13,7 @@ namespace SpacetimeDB::Database {
 
         struct GetDescription final : HttpRequest { };
 
-        struct Delete final : HttpRequest
+        struct Delete         final : HttpRequest
         {
             Delete() = delete;
             explicit Delete(const SpacetimeToken& Bearer) : HttpRequest(Bearer) { }
@@ -64,7 +64,7 @@ namespace SpacetimeDB::Database {
 
         struct PublishTo  final : HttpResponse { };
 
-        struct Description final : HttpResponse
+        struct GetDescription final : HttpResponse
         {
             String Identity;
             String OwnerIdentity;
@@ -94,8 +94,6 @@ namespace SpacetimeDB::Database {
         struct GetIdentity final : HttpResponse
         {
             HexString Identity;
-
-            
         };
 
         struct Subscribe final : HttpResponse { };
