@@ -1,8 +1,9 @@
 # SpacetimeDB C++ SDK
 
-> ⚠️ **Early-stage — not yet functional!**
+> ⚠️ **Early-stage — not all is functional!**
 
-A modern, header-only (plus a small .cpp core) C++ client for SpacetimeDB, with HTTP and JSON support out of the box.
+A modern, header-only (plus a small .cpp core) C++ client for SpacetimeDB, with HTTP, JSON and WebSocket 
+support out of the box.
 
 ## Status
 
@@ -13,33 +14,54 @@ A modern, header-only (plus a small .cpp core) C++ client for SpacetimeDB, with 
 
 ## 👹 Backlog
 
+### Dev
+
 - [x] **Project layout** (`include/`, `src/`, `tools/CodegenTool/`, `examples/`, `tests/`)
 - [x] **HttpClient** wrapper around `cpr::cpr` (`Get`/`Post`, headers overload)
 - [x] **Json** alias (`using Json = nlohmann::json;`)
-- [x] **Config** & **Client** classes with Builder pattern
-- [x] **Umbrella header** (`SpacetimeDB.hpp`) and `version.hpp`
-- [x] **IdentityClient** + **IdentityModels** (`CreateIdentityRequest`, `IdentityInfo`, etc)
-- [ ] **DatabaseClient** + **DatabaseModels** (`ExecuteSqlRequest`, `ExecuteSqlResponse`, `PublishDocumentRequest`)
-- [ ] **Examples** (`quickstart.cpp`, `subscribe.cpp`)
-- [ ] **Tests** (`IdentityTests.cpp`, `DatabaseTests.cpp`, `UtilsTests.cpp`)
+- [ ] **Config** & **Client** classes with Builder pattern
+- [X] **Umbrella header** (`SpacetimeDB.hpp`) and `version.hpp`
+  
+- ### Database Client
+- [ ] `POST /v1/database`
+- [ ] `POST /v1/database/:name_or_identity`
+- [X] `GET /v1/database/:name_or_identity`
+- [ ] `DELETE /v1/database/:name_or_identity`
+- [ ] `GET /v1/database/:name_or_identity/names`
+- [ ] `POST /v1/database/:name_or_identity/names`
+- [ ] `PUT /v1/database/:name_or_identity/names`
+- [ ] `GET /v1/database/:name_or_identity/identity`
+- [ ] `GET /v1/database/:name_or_identity/subscribe`
+- [X] `POST /v1/database/:name_or_identity/call/:reducer`
+- [X] `GET /v1/database/:name_or_identity/schema`
+- [ ] `GET /v1/database/:name_or_identity/logs`
+- [ ] `POST /v1/database/:name_or_identity/sql`
+
+### Spacetime Native, Schema codegen integration 
+- [ ] Code Generation from Schema (`GET /v1/database/{database}/schema`)
+- [ ] Hook `tools/CodegenTool` into the build so that `include/Schema/Generated/` is always up-to-date
+- [ ] Generate Native Coding from Schemas
+- [ ] **WebSocket client**: Keep Spacetime Algebraic Types Fed From Subscriptions
+- [x] **Identity Client + IdentityModels**: All Requests parsed to Native C++
+
+### Complete Examples
+- [ ] **Examples**: `quickstart.cpp`
+- [ ] **Examples**: `subscribe.cpp`)
+
+### Unit tests & coverage
+- [X] **Tests**: Identity
+- [ ] **Tests**: Database
+
+
+### Other
 - [ ] **Internal APIs**
     - Move implementation-only helpers into `SpacetimeDb::detail` namespace
     - Consider **Pimpl** in public classes for ABI stability
 - [ ] **Asynchronous support**
-    - Add `async` overloads returning `std::future<Json>` (or callbacks)
+    - Add `async` overloads returning promises (e.g. `std::future<Json>`) or callbacks
 - [ ] **CMake install & export**
     - Add `install(TARGETS … EXPORT …)`
     - Generate `SpacetimeDbSdkConfig.cmake` for `find_package(SpacetimeDbSdk CONFIG)`
-- [ ] **Schema codegen integration**
-    - Add `tools/CodegenTool` to generate `include/Schema/Generated/` from `GET /v1/database/{database}/schema`
-- [ ] **Schema codegen integration**
-    - Hook `tools/CodegenTool` into the build so that `include/Schema/Generated/` is always up-to-date
-- [ ] **WebSocket client**
-    - Implement `WebSocketClient` service stub under `include/SpacetimeDb/WebSocket/`
-- [ ] **Reducer client**
-    - Add `ReducerClient` + `ReducerModels` for the `CallReducer` API
-- [ ] **Complete examples**
-    - Flesh out `quickstart.cpp` and `subscribe.cpp` with real endpoints and CLI flags
 - [ ] **Unit tests & coverage**
     - Mock `HttpClient` to verify request paths, payloads, headers, and JSON marshalling
 - [ ] **Documentation**
