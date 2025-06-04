@@ -5,16 +5,16 @@
 
 namespace SpacetimeDB::Database {
 
-    Client::Client(const HttpClient& http, WebSocketClient& WebSocket, SpacetimeToken Token)
-    : Http_(http), WebSocket_(WebSocket), Token_(std::move(Token)), WebSocketConnected_(false)
+    const String DatabaseEndpoint = "/v1/database";
+
+    Client::Client(const String& NameOrIdentity, const String& BaseUrl, const Milliseconds Timeout)
+    : HttpClient(BaseUrl, Timeout)
+    , NameOrIdentity(NameOrIdentity)
     {
 
     }
 
-    Client::~Client() {
-        // Optionally, close the WebSocket if still open
-        WebSocket_.Close();
-    }
+    Client::~Client() = default;
 
     Result<Response::PublishNew> Client::PublishNew(const Request::PublishNew& Request) const
     {
@@ -28,12 +28,25 @@ namespace SpacetimeDB::Database {
 
     Result<Response::GetDescription> Client::GetDescription(const Request::GetDescription& Request) const
     {
-        ReturnError("Not implemented");
+        const String Endpoint = DatabaseEndpoint + "/" + NameOrIdentity;
+        const auto HttpResponse = Get(Endpoint, Request);
+        if (HttpResponse.error)
+        {
+            ReturnError("HTTP GET error: " + HttpResponse.error.message);
+        }
+
+        return Response::GetDescription::FromResponse(HttpResponse);
     }
 
-    Result<Response::Delete> Client::Delete(const Request::Delete& Request) const
+    Result<Response::DeleteDB> Client::DeleteDB(const Request::DeleteDB& Request) const
     {
-        ReturnError("Not implemented");
+        const String Endpoint = DatabaseEndpoint + "/" + NameOrIdentity;
+        if (const auto HttpResponse = Delete(Endpoint, Request); HttpResponse.error)
+        {
+            ReturnError("HTTP GET error: " + HttpResponse.error.message);
+        }
+
+        return Response::DeleteDB{};
     }
 
     Result<Response::GetNames> Client::GetNames(const Request::GetNames& Request) const

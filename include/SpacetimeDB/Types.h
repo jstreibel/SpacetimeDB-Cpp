@@ -17,6 +17,9 @@ namespace SpacetimeDB
     using HexString = std::string;
     using SpacetimeToken = std::string;
 
+    using Int = int32_t;
+    using Milliseconds = Int;
+
     template <typename T>
     using Array = std::vector<T>;
 

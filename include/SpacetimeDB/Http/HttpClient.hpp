@@ -1,5 +1,6 @@
 #pragma once
 
+#include <variant>
 #include <cpr/cpr.h>
 
 #include "Error.hpp"
@@ -53,9 +54,10 @@ namespace SpacetimeDB {
      */
     class HttpClient {
     public:
-        explicit HttpClient(String baseUrl="http://localhost:3000", int timeoutMs = 30000);
+        explicit HttpClient(String BaseUrl="http://localhost:3000", int timeoutMs = 30000);
         ~HttpClient();
 
+        [[nodiscard]] cpr::Response Get(const String &Path, const HttpRequest& Request) const;
         [[nodiscard]] Result<HttpResponse> Get(
             const String& Path,
             const Header& Head = {}) const;
@@ -64,11 +66,13 @@ namespace SpacetimeDB {
             const String& Body,
             const Header& Head = {}) const;
 
+        cpr::Response Delete(const String& Path, const HttpRequest& Head) const;
+
         [[nodiscard]] String GetUrl(const String &Path) const;
 
-        [[nodiscard]] String GetBaseUrl() const { return baseUrl_; }
+        [[nodiscard]] String GetBaseUrl() const { return BaseUrl; }
     private:
-        String       baseUrl_;
+        const String BaseUrl;
         int          timeoutMs_;
         // cpr::Session      session_;
     };

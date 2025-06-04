@@ -13,18 +13,17 @@ namespace SpacetimeDB::Database {
     ///  - Subscribe / Reducer calls over WebSocket
     ///  - Etc.
     ///
-    class Client {
+    class Client : public HttpClient {
     public:
         ///
         /// Construct with:
-        ///  - an HttpClient (configured with base URL),
-        ///  - a WsClient instance (initially not connected),
-        ///  - a valid JWT token to use for auth.
+        ///  - a BaseUrl
+        ///  - a Timeout for calls
         ///
         explicit Client(
-            const HttpClient& http,
-            WebSocketClient& WebSocket,
-            SpacetimeToken);
+            const String& NameOrIdentity,
+            const String& BaseUrl="http://localhost:3000",
+            Milliseconds Timeout=30000);
         ~Client();
 
         /// POST /v1/database
@@ -37,11 +36,11 @@ namespace SpacetimeDB::Database {
 
         /// GET /v1/database/:name_or_identity
         /// Get a JSON description of a database.
-        HTTP_METHOD_SIGNATURE(GetDescription)
+        Result<Response::GetDescription> GetDescription(const Request::GetDescription& Request={}) const;
 
         /// DELETE /v1/database/:name_or_identity
         /// Delete a database.
-        HTTP_METHOD_SIGNATURE(Delete)
+        HTTP_METHOD_SIGNATURE(DeleteDB)
 
         /// GET /v1/database/:name_or_identity/names
         /// Get the names this database can be identified by.
@@ -85,10 +84,7 @@ namespace SpacetimeDB::Database {
         HTTP_METHOD_SIGNATURE(ExecuteSql)
 
     private:
-        const HttpClient& Http_;
-        WebSocketClient&         WebSocket_;
-        SpacetimeToken           Token_;
-        bool                     WebSocketConnected_;
+        const String NameOrIdentity;
     };
 
 } // namespace SpacetimeDb

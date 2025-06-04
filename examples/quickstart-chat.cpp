@@ -88,7 +88,7 @@ int main() {
             return 1;
         }
         const auto [ShortLivedToken] = SpacetimeDB::GetResult(ShortTokenResult);
-        std::cout << "[Identity] got websocket token: " << ShortLivedToken << "\n";
+        std::cout << "[Identity] got short-lived websocket token: " << ShortLivedToken << "\n";
 
 
         auto PublicKeyResult = IdClient.GetPublicKey();
@@ -150,18 +150,39 @@ int main() {
                 break;
         }
 
+        /*****************************************************************
+         * DATABASE
+         **/
+
+        const SpacetimeDB::Database::Client DatabaseClient(
+            "quickstart-chatty-chat",
+            "http://localhost:3000",
+            /*timeoutMs=*/30000);
+
+        const auto DescriptionResult = DatabaseClient.GetDescription();
+        if(!SpacetimeDB::IsValid(DescriptionResult))
+        {
+            const auto Error = SpacetimeDB::GetErrorMessage(DescriptionResult);
+            std::cerr << "[Database] failed to get description: " << Error << "\n";
+        }
+        const auto& Description = SpacetimeDB::GetResult(DescriptionResult);
+        std::cout << "[Database] got description for 'quickstart-chatty-chat': " << "\n"
+            << "\tIdentity: " << Description.Identity << "\n"
+            << "\tOwner Identity: " << Description.OwnerIdentity << "\n"
+            << "\tToken: " << Description.HostType << "\n"
+            << "\tHash: " << Description.InitialWasmHash << std::endl;
 
 
         // ---- 3.4 Prepare a WebSocket client and a DatabaseClient for the “chat” module
         SpacetimeDB::WebSocketClient WebSocketClient;
         auto Token = Identity.Token;
-        SpacetimeDB::Database::DatabaseClient  DatabaseClient(Http, WebSocketClient, Token);
 
         // ---- 3.5 Subscribe to new rows in the `messages` table over WebSocket.
         //         We listen for InsertEvent frames and print each incoming message.
         //
         //   The subscription query orders by created_at so we see messages in chronological order.
 
+        /*
         DatabaseClient.Subscribe(
             "quickstart-chat",
             "SELECT * FROM messages ORDER BY created_at",
@@ -233,6 +254,7 @@ int main() {
 
         // ---- 3.8 Clean up: close the WebSocket before exiting
         WebSocketClient.Close();
+        */
     }
     catch (const std::exception& Exception) {
         std::cerr << "[Fatal Error] " << Exception.what() << "\n";

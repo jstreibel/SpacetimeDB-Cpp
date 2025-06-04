@@ -83,7 +83,7 @@ namespace SpacetimeDB {
     {
         // GET /identity/{id}/databases
         const auto Path = "/v1/identity/" + IdentityId + "/databases";
-        const auto HttpGetResult = http_.Get(Path, {});
+        const auto HttpGetResult = http_.Get(Path, Header{});
 
         OnError(HttpGetResult, "Failed to GET " + Path + ": " + GetErrorMessage(HttpGetResult));
 
@@ -132,7 +132,7 @@ namespace SpacetimeDB {
     Result<GetPublicKeyResponse> IdentityClient::GetPublicKey( ) const
     {
         const auto Path = std::string("/v1/identity/public-key");
-        const auto HttpGetResult = http_.Get(Path,{});
+        const auto HttpGetResult = http_.Get(Path,Header{});
 
         OnError(HttpGetResult, "Failed to GET " + Path + ": " + GetErrorMessage(HttpGetResult));
 

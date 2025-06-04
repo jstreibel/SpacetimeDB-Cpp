@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+#include <variant>
 #include <Http/Json.hpp>
 #include "Types.h"
 
@@ -13,10 +15,10 @@ namespace SpacetimeDB::Database {
 
         struct GetDescription final : HttpRequest { };
 
-        struct Delete         final : HttpRequest
+        struct DeleteDB         final : HttpRequest
         {
-            Delete() = delete;
-            explicit Delete(const SpacetimeToken& Bearer) : HttpRequest(Bearer) { }
+            DeleteDB() = delete;
+            explicit DeleteDB(const SpacetimeToken& Bearer) : HttpRequest(Bearer) { }
         };
 
         struct GetNames final : HttpRequest { };
@@ -70,9 +72,38 @@ namespace SpacetimeDB::Database {
             String OwnerIdentity;
             String HostType;
             String InitialWasmHash;
+
+            static Result<GetDescription> FromResponse(cpr::Response CprResponse)
+            {
+                GetDescription Response;
+                Response.StatusCode = CprResponse.status_code;
+                Response.Body = CprResponse.text;
+
+                auto JsonObj = Json::parse(CprResponse.text);
+
+                if(!JsonObj.contains("database_identity"))
+                    ReturnError("Failed to parse 'database_identity' field from http response.");
+                if(!JsonObj.contains("owner_identity"))
+                    ReturnError("Failed to parse 'owner_identity' field from http response.");
+                if(!JsonObj.contains("host_type"))
+                    ReturnError("Failed to parse 'host_type' field from http response.");
+                if(!JsonObj.contains("initial_program"))
+                    ReturnError("Failed to parse 'initial_program' field from http response.");
+
+                using Exception = const nlohmann::json::exception&;
+                try { Response.Identity        = JsonObj["database_identity"]["__identity__"]; }
+                catch (Exception& E) { ReturnError(String("Failed to parse 'database_identity' from http response: ") + E.what()); }
+                try { Response.OwnerIdentity   = JsonObj["owner_identity"]["__identity__"]; }
+                catch (Exception& E) { ReturnError(String("Failed to parse 'owner_identity' from http response: ") + E.what()); }
+                Response.HostType        = "wasm";
+                try { Response.InitialWasmHash = JsonObj["initial_program"]; }
+                catch (Exception& E) { ReturnError(String("Failed to parse 'initial_program' from http response: ") + E.what()); }
+
+                return Response;
+            }
         };
 
-        struct Delete final : HttpResponse { };
+        struct DeleteDB final : HttpResponse { };
 
         struct GetNames final : HttpRequest
         {

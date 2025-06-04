@@ -3,23 +3,6 @@
 #include <catch2/catch.hpp>
 
 #include "../include/SpacetimeDB/Http/Endpoints/Identity/IdentityClient.hpp"
-#include "../include/SpacetimeDB/Http/Json.hpp"
-
-// A fake HTTP client to capture requests
-struct FakeHttp {
-    std::string lastPath;
-    std::string lastPayload;
-    std::map<std::string,std::string> lastHeaders;
-
-    SpacetimeDB::Json Post(const std::string& path,
-                                  const std::string& payload,
-                                  const std::map<std::string,std::string>& headers) {
-        lastPath = path;
-        lastPayload = payload;
-        lastHeaders = headers;
-        return SpacetimeDB::Json{{"status","ok"}};
-    }
-};
 
 TEST_CASE("IdentityClient::Login formats request correctly", "[Identity]") {
     // SpacetimeDB::HttpClient httpWrapper{};
