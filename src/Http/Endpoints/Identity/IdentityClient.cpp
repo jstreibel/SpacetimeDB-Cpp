@@ -12,9 +12,9 @@ namespace SpacetimeDB {
     Result<IdentityInfo> IdentityClient::Login(const std::string& ExternalJwt) const
     {
         // Build headers: Authorization + Content-Type
-        std::map<std::string,std::string> headers;
-        headers["Authorization"] = "Bearer " + ExternalJwt;
-        headers["Content-Type"]  = "application/json";
+        Header Head;
+        Head["Authorization"] = "Bearer " + ExternalJwt;
+        Head["Content-Type"]  = "application/json";
 
         // Create (empty) JSON request body via CreateIdentityRequest
         const Json bodyJson = CreateIdentityRequest { }.ToJson();
@@ -22,7 +22,7 @@ namespace SpacetimeDB {
 
         // POST to "/v1/identity"
         // (here we expect our HttpClient not to inject "/v1")
-        const auto PostResult = http_.Post("/v1/identity", bodyString, headers);
+        const auto PostResult = http_.Post("/v1/identity", bodyString, Head);
         if (!IsValid(PostResult))
         {
             ReturnError("IdentityClient::Login failed: " + GetErrorMessage(PostResult));
@@ -109,13 +109,13 @@ namespace SpacetimeDB {
         const GetIdentityWebSocketTokenRequest& Request) const
     {
         const auto Path = std::string("/v1/identity/websocket-token");
-        const auto Headers = Request.GetHeaders();
+        const auto Head = Request.GetHeaders();
 
         const auto HttpGetResult =
             http_.Post(
                 Path,
                 Json().dump(),
-                Headers);
+                Head);
         OnError(HttpGetResult, "Failed to POST " + Path + ": " + GetErrorMessage(HttpGetResult));
 
         const auto [StatusCode, Body] = GetResult(HttpGetResult);

@@ -1,6 +1,8 @@
 #pragma once
+
+#include <Types.h>
+
 #include <functional>
-#include <string>
 #include "Http/Json.hpp"
 
 namespace SpacetimeDB {
@@ -15,7 +17,7 @@ namespace SpacetimeDB {
 
         /// Connect to the given ws:// or wss:// URL.
         /// Throws or signals an error if the handshake fails.
-        static void Connect(const std::string& wsUrl);
+        void Connect(const String& wsUrl);
 
         /// Send a JSON object (serialized) over the open WebSocket.
         void Send(const Json& message);

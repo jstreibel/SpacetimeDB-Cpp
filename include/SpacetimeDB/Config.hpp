@@ -1,13 +1,14 @@
 #pragma once
-#include <string>
+
+#include <Types.h>
 #include <chrono>
 
 namespace SpacetimeDB {
 
     struct ClientConfig {
-        std::string BaseUrl;
+        String BaseUrl;
         std::chrono::milliseconds Timeout = std::chrono::seconds(30);
-        std::string AuthToken;
+        String AuthToken;
     };
 
 } // namespace SpacetimeDb

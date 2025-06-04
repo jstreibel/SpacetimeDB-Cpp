@@ -1,7 +1,6 @@
 #pragma once
-#include <stdexcept>
-#include <string>
-#include <variant>
+
+#include <Types.h>
 
 namespace SpacetimeDB {
 
@@ -11,14 +10,14 @@ namespace SpacetimeDB {
     using Result = std::variant<RETURN_TYPE, ErrorType>;
 
     #define ReturnError(Message) \
-        return SpacetimeDB::ErrorType("Location " + std::string(__FILE__) + ":" + std::to_string(__LINE__) + "\n\tMessage: \"" + (Message) + "\"")
+        return SpacetimeDB::ErrorType("Location " + String(__FILE__) + ":" + std::to_string(__LINE__) + "\n\tMessage: \"" + (Message) + "\"")
 
     #define OnError(CallResult, Message) \
         if (!SpacetimeDB::IsValid(CallResult)) ReturnError(Message);
 
 
     template<typename RETURN_TYPE>
-    std::string GetErrorMessage(Result<RETURN_TYPE> SomeReturnedValue)
+    String GetErrorMessage(Result<RETURN_TYPE> SomeReturnedValue)
     {
         return std::get<std::runtime_error>(SomeReturnedValue).what();
     }
@@ -37,7 +36,7 @@ namespace SpacetimeDB {
 
     class HttpError final : public std::runtime_error {
     public:
-        HttpError(const int Code, const std::string& msg)
+        HttpError(const int Code, const String& msg)
             : std::runtime_error(msg), Code(Code) {}
         int Code;
     };

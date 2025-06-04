@@ -1,14 +1,12 @@
 #include "../../include/SpacetimeDB/Http/Endpoints/Database/DatabaseClient.hpp"
 #include <stdexcept>
 #include <future>
+#include <utility>
 
-namespace SpacetimeDB {
+namespace SpacetimeDB::Database {
 
-    DatabaseClient::DatabaseClient(
-        const HttpClient& http,
-        WebSocketClient& WebSocket,
-        const std::string& token)
-    : Http_(http), WebSocket_(WebSocket), Token_(token), WebSocketConnected_(false)
+    DatabaseClient::DatabaseClient(const HttpClient& http, WebSocketClient& WebSocket, SpacetimeToken Token)
+    : Http_(http), WebSocket_(WebSocket), Token_(std::move(Token)), WebSocketConnected_(false)
     {
 
     }
@@ -18,9 +16,7 @@ namespace SpacetimeDB {
         WebSocket_.Close();
     }
 
-    Result<Json> DatabaseClient::ExecuteSql(const std::string& ModuleName,
-                                           const std::string& Sql,
-                                           const Json& Params) const
+    Result<Json> DatabaseClient::ExecuteSql(const String& ModuleName, const String& Sql, const Json& Params) const
     {
         const std::string Path = "/v1/database/" + ModuleName + "/sql";
         Json payload = Json::object();
@@ -30,11 +26,11 @@ namespace SpacetimeDB {
         }
 
         // Build headers
-        std::map<std::string, std::string> headers;
-        headers["Authorization"] = "Bearer " + Token_;
-        headers["Content-Type"]  = "application/json";
+        Header Head;
+        Head["Authorization"] = "Bearer " + Token_;
+        Head["Content-Type"]  = "application/json";
 
-        const auto PostResult = Http_.Post(Path, payload.dump(), headers);
+        const auto PostResult = Http_.Post(Path, payload.dump(), Head);
         if (!IsValid(PostResult))
         {
             const auto Message = GetErrorMessage(PostResult);
@@ -49,7 +45,7 @@ namespace SpacetimeDB {
 
     void DatabaseClient::Subscribe(const std::string& ModuleName,
                                    const std::string& SqlQuery,
-                                   std::function<void(const Json& Event)> OnEvent)
+                                   const std::function<void(const Json& Event)>& OnEvent)
     {
         if (!WebSocketConnected_) {
             // Build ws:// URL
@@ -71,9 +67,7 @@ namespace SpacetimeDB {
         WebSocket_.Send(subMsg);
     }
 
-    Result<Json> DatabaseClient::CallReducer(const std::string& ModuleName,
-                                            const std::string& ReducerName,
-                                            const Json& Args)
+    Result<Json> DatabaseClient::CallReducer(const String& ModuleName, const String& ReducerName, const Json& Args)
     {
         if (!WebSocketConnected_) {
             const std::string WebSocketUrl = "ws://localhost:3000/v1/database/" + ModuleName + "/ws?token=" + Token_;
@@ -102,15 +96,6 @@ namespace SpacetimeDB {
         });
 
         return Future.get();  // Blocks until ReducerResult or Error arrives
-    }
-
-    void DatabaseClient::Unsubscribe(const std::string& SubscriptionId) const
-    {
-        if (!WebSocketConnected_) return;
-        Json Message = Json::object();
-        Message["type"] = "Unsubscribe";
-        Message["subscription_id"] = SubscriptionId;
-        WebSocket_.Send(Message);
     }
 
 } // namespace SpacetimeDB

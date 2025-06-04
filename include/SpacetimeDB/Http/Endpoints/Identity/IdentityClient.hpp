@@ -15,7 +15,7 @@ namespace SpacetimeDB {
         explicit IdentityClient(HttpClient& http);
         ~IdentityClient();
 
-        [[nodiscard]] Result<IdentityInfo> Login(const std::string& ExternalJwt) const;
+        [[nodiscard]] Result<IdentityInfo> Login(const String& ExternalJwt) const;
 
         ///
         /// Create a new identity by POSTing {} to /v1/identity.
@@ -37,11 +37,11 @@ namespace SpacetimeDB {
         /// List databases owned by an identity via GET /v1/identity/{identityId}/databases.
         /// Returns DatabasesInfo.
         ///
-        [[nodiscard]] Result<DatabasesInfo> GetDatabases(const std::string& IdentityId) const;
+        [[nodiscard]] Result<DatabasesInfo> GetDatabases(const String& IdentityId) const;
 
 
         [[nodiscard]] Result<SetEmailResponse> SetEmail(
-            const std::string& IdentityId,
+            const String& IdentityId,
             const SetEmailRequest& Request) const;
 
         [[nodiscard]] Result<VerifyIdentityResponse> VerifyIdentity(const VerifyIdentityRequest& Request) const;

@@ -5,7 +5,7 @@
 #include "DatabaseModels.hpp"
 #include "Http/WebSocket/WebSocketClient.hpp"
 
-namespace SpacetimeDB {
+namespace SpacetimeDB::Database {
 
     ///
     /// Provides both HTTP and WebSocket database operations:
@@ -23,46 +23,67 @@ namespace SpacetimeDB {
         explicit DatabaseClient(
             const HttpClient& http,
             WebSocketClient& WebSocket,
-            const std::string & token);
+            SpacetimeToken);
         ~DatabaseClient();
 
-        ///
-        /// Execute raw SQL via POST /v1/database/{module}/sql
-        /// Returns the parsed JSON response (e.g., {"rows": [...]} or {"rows_affected": N}).
-        ///
-        [[nodiscard]] Result<Json> ExecuteSql(const std::string& ModuleName,
-                               const std::string& Sql,
-                               const Json& Params = {}) const;
+        /// POST /v1/database
+        /// Publish a new database given its module code.
+        Result<String> PublishNewDatabase();
 
-        ///
-        /// Open a WebSocket to ws://…/v1/database/{moduleName}/ws?token={token}.
-        /// Then send a Subscribe frame: {"type":"Subscribe","query":sqlQuery}.
-        /// All Insert/Update/Delete JSON events are forwarded to onEvent.
-        ///
+        /// POST /v1/database/:name_or_identity
+        /// Publish to a database given its module code.
+        void PublishToDatabase();
+
+        /// GET /v1/database/:name_or_identity
+        /// Get a JSON description of a database.
+        void GetDatabaseDescription();
+
+        /// DELETE /v1/database/:name_or_identity
+        /// Delete a database.
+        void DeleteDatabase();
+
+        /// GET /v1/database/:name_or_identity/names
+        /// Get the names this database can be identified by.
+        void GetDatabaseNames();
+
+        /// POST /v1/database/:name_or_identity/names
+        /// Add a new name for this database.
+        void AddDatabaseName(const String & databaseName);
+
+        /// PUT /v1/database/:name_or_identity/names
+        /// Set the list of names for this database.
+        void SetDatabaseNames();
+
+        /// GET /v1/database/:name_or_identity/identity
+        /// Get the identity of a database.
+        void GetDatabaseIdentity();
+
+        /// GET /v1/database/:name_or_identity/subscribe
+        /// Begin a WebSocket connection.
         void Subscribe(const std::string& ModuleName,
-                       const std::string& SqlQuery,
-                       std::function<void(const Json& event)> OnEvent);
+                                   const std::string& SqlQuery,
+                                   const std::function<void(const Json& Event)>& OnEvent);
 
-        ///
-        /// Call a reducer over WebSocket:
-        ///   Send {"type":"CallReducer","reducer":reducerName,"args":args}.
-        ///   Block (or asynchronously wait) for a {"type":"ReducerResult",…} frame.
-        /// Returns the raw JSON result.
-        ///
-        Result<Json> CallReducer(const std::string& ModuleName,
-                                const std::string& ReducerName,
-                                const Json& Args);
+        /// POST /v1/database/:name_or_identity/call/:reducer
+        /// Invoke a reducer in a database.
+        Result<Json> CallReducer(const String& ModuleName, const String& ReducerName, const Json& Args);
 
-        ///
-        /// Unsubscribe from an existing subscription by its ID.
-        /// Sends {"type":"Unsubscribe","subscription_id":id}.
-        ///
-        void Unsubscribe(const std::string& SubscriptionId) const;
+        /// GET /v1/database/:name_or_identity/schema
+        /// Get the schema for a database.
+        void GetSchema();
+
+        /// GET /v1/database/:name_or_identity/logs
+        /// Retrieve logs from a database.
+        void GetLogs();
+
+        /// POST /v1/database/:name_or_identity/sql
+        /// Run a SQL query against a database.
+        [[nodiscard]] Result<Json> ExecuteSql(const String& ModuleName, const String& Sql, const Json& Params) const;
 
     private:
         const HttpClient& Http_;
         WebSocketClient&         WebSocket_;
-        std::string              Token_;
+        SpacetimeToken           Token_;
         bool                     WebSocketConnected_;
     };
 

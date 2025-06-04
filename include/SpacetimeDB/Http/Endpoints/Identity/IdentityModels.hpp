@@ -5,6 +5,8 @@
 #include <Http/Json.hpp>
 #include <utility>
 
+#include "Types.h"
+
 namespace SpacetimeDB {
 
     /// Request payload for POST /v1/identity
@@ -13,7 +15,7 @@ namespace SpacetimeDB {
         [[nodiscard]]
         Json ToJson() const { return Json::object(); }
         [[nodiscard]]
-        std::map<std::string, std::string> GetHeaders() const
+        Header GetHeaders() const
         {
             return {{"Content-Type", "application/json"}};
         }
@@ -21,8 +23,8 @@ namespace SpacetimeDB {
 
     /// Response payload for POST /v1/identity/
     struct IdentityInfo {
-        std::string Id;
-        std::string Token;  // may be empty if not returned by server
+        String Id;
+        SpacetimeToken Token;  // may be empty if not returned by server
 
         /// Deserialize from the raw JSON response
         static Result<IdentityInfo> FromJson(const Json& JsonData) {
@@ -30,11 +32,11 @@ namespace SpacetimeDB {
 
             try
             {
-                Info.Id    = JsonData.at("id").get<std::string>();
-                Info.Token = JsonData.value("token", std::string{});
+                Info.Id    = JsonData.at("id").get<String>();
+                Info.Token = JsonData.value("token", String{});
             } catch (const nlohmann::detail::out_of_range& e)
             {
-                ReturnError(e.what() + std::string(" in ") + JsonData.dump() + ". ");
+                ReturnError(e.what() + String(" in ") + JsonData.dump() + ". ");
             }
 
             return Info;
@@ -46,11 +48,11 @@ namespace SpacetimeDB {
     /// -> Generate a short-lived access token for use in untrusted contexts.
     struct GetIdentityWebSocketTokenRequest
     {
-        std::string Token;
+        SpacetimeToken Token;
 
-        explicit GetIdentityWebSocketTokenRequest(std::string Token) : Token(std::move(Token)) {}
+        explicit GetIdentityWebSocketTokenRequest(SpacetimeToken Token) : Token(std::move(Token)) {}
 
-        std::map<std::string, std::string> GetHeaders() const
+        [[nodiscard]] Header GetHeaders() const
         {
             return {
                 {"Authorization", "Bearer " + Token},
@@ -63,7 +65,7 @@ namespace SpacetimeDB {
     /// Response for POST /v1/identity/websocket-token
     struct IdentityWebSocketTokenResponse
     {
-        std::string Token;
+        SpacetimeToken Token;
         static Result<IdentityWebSocketTokenResponse> FromJson(const Json& JsonData)
         {
             if (!JsonData.contains("token"))
@@ -78,7 +80,7 @@ namespace SpacetimeDB {
     /// Response payload for GET /v1/identity/{id}/databases
     struct DatabasesInfo
     {
-        std::vector<std::string> Addresses;
+        std::vector<String> Addresses;
 
         static Result<DatabasesInfo> FromJson(const Json& JsonData) {
             DatabasesInfo Info;
@@ -102,7 +104,7 @@ namespace SpacetimeDB {
                 ReturnError("Response did not contain 'addresses' field. JsonResponse: " + JsonData.dump() + "");
             }
 
-            Info.Addresses = JsonData.at(Key).get<std::vector<std::string>>();
+            Info.Addresses = JsonData.at(Key).get<std::vector<String>>();
 
             return Info;
         }
@@ -113,9 +115,9 @@ namespace SpacetimeDB {
     /// Returns a response of content-type application/pem-certificate-chain.
     struct GetPublicKeyResponse
     {
-        std::string Data;
+        String Data;
 
-        static Result<GetPublicKeyResponse> FromPemCertificateChain(const std::string& Data) {
+        static Result<GetPublicKeyResponse> FromPemCertificateChain(const String& Data) {
             return GetPublicKeyResponse{Data};
         }
     };
@@ -125,14 +127,14 @@ namespace SpacetimeDB {
     /// Associate an email with a Spacetime identity
     struct SetEmailRequest
     {
-        std::string Email;
-        std::string AuthorizationToken;
+        String Email;
+        String AuthorizationToken;
 
         [[nodiscard]] Json ToJson() const {
             return Json{{"email", Email}};
         }
 
-        [[nodiscard]] std::map<std::string, std::string> GetHeaders() const {
+        [[nodiscard]] Header GetHeaders() const {
             return {{"Authorization", "Bearer " + AuthorizationToken}};
         }
     };
@@ -146,7 +148,7 @@ namespace SpacetimeDB {
     {
         IdentityInfo IdentityToVerify;
 
-        [[nodiscard]] std::map<std::string, std::string> GetHeaders() const
+        [[nodiscard]] Header GetHeaders() const
         {
             return {{"Authorization", "Bearer " + IdentityToVerify.Token}};
         }

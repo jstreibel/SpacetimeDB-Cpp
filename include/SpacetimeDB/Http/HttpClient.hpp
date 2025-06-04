@@ -1,16 +1,39 @@
 #pragma once
-#include <string>
-#include <map>
+
 #include <cpr/cpr.h>
 
 #include "Error.hpp"
+#include "Json.hpp"
 
 namespace SpacetimeDB {
+    using Header = cpr::Header;
+
+    struct HttpRequest
+    {
+        Optional<SpacetimeToken> Bearer;
+        Optional<String> ContentType;
+
+        HttpRequest() = default;
+        explicit
+        HttpRequest(SpacetimeToken Bearer)                      : Bearer(Bearer) { }
+        HttpRequest(SpacetimeToken Bearer, String ContentType)  : Bearer(Bearer), ContentType(ContentType) {}
+
+        virtual ~HttpRequest() = default;
+        virtual String GetBody()   const { return {}; }
+        virtual Header GetHeader() const
+        {
+            Header Head;
+            if (Bearer.has_value())      Head["Authorization"] = "Bearer " + Bearer.value();
+            if (ContentType.has_value()) Head["Content-Type"] = ContentType.value();
+            return Head;
+        }
+        virtual Json AsJson() const { return GetBody(); }
+    };
 
     /// A minimal HTTP response wrapper
     struct HttpResponse {
-        long          StatusCode;
-        std::string   Body;
+        long     StatusCode;
+        String   Body;
     };
 
     /**
@@ -24,23 +47,23 @@ namespace SpacetimeDB {
      */
     class HttpClient {
     public:
-        explicit HttpClient(std::string baseUrl="http://localhost:3000", int timeoutMs = 30000);
+        explicit HttpClient(String baseUrl="http://localhost:3000", int timeoutMs = 30000);
         ~HttpClient();
 
         [[nodiscard]] Result<HttpResponse> Get(
-            const std::string& Path,
-            const std::map<std::string,std::string>& Headers = {}) const;
+            const String& Path,
+            const Header& Head = {}) const;
         [[nodiscard]] Result<HttpResponse> Post(
-            const std::string& Path,
-            const std::string& Body,
-            const std::map<std::string,std::string>& Headers = {}) const;
+            const String& Path,
+            const String& Body,
+            const Header& Head = {}) const;
 
-        [[nodiscard]] std::string GetUrl(const std::string &Path) const;
+        [[nodiscard]] String GetUrl(const String &Path) const;
 
-        [[nodiscard]] std::string GetBaseUrl() const { return baseUrl_; }
+        [[nodiscard]] String GetBaseUrl() const { return baseUrl_; }
     private:
-        std::string       baseUrl_;
-        int               timeoutMs_;
+        String       baseUrl_;
+        int          timeoutMs_;
         // cpr::Session      session_;
     };
 } // namespace SpacetimeDb

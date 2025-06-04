@@ -155,7 +155,7 @@ int main() {
         // ---- 3.4 Prepare a WebSocket client and a DatabaseClient for the “chat” module
         SpacetimeDB::WebSocketClient WebSocketClient;
         auto Token = Identity.Token;
-        SpacetimeDB::DatabaseClient  DatabaseClient(Http, WebSocketClient, Token);
+        SpacetimeDB::Database::DatabaseClient  DatabaseClient(Http, WebSocketClient, Token);
 
         // ---- 3.5 Subscribe to new rows in the `messages` table over WebSocket.
         //         We listen for InsertEvent frames and print each incoming message.
