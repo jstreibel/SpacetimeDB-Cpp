@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../Json.hpp"
+#include "../../HttpClient.hpp"
 #include "../../../Types.h"
 
 #include <iostream>
