@@ -1,9 +1,10 @@
 #pragma once
 
-#include <Http/HttpClient.hpp>
-#include <Http/Json.hpp>
+#include "../../HttpClient.hpp"
+#include "../../Json.hpp"
+#include "../../WebSocket/WebSocketClient.hpp"
+
 #include "DatabaseModels.hpp"
-#include "Http/WebSocket/WebSocketClient.hpp"
 
 namespace SpacetimeDB::Database {
 

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <Types.h>
+#include "../Json.hpp"
+#include "../../Types.h"
 
 #include <functional>
-#include "Http/Json.hpp"
 
 namespace SpacetimeDB {
     ///

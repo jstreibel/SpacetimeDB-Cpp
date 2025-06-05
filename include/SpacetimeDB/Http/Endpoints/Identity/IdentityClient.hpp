@@ -1,9 +1,10 @@
 #pragma once
 
-#include <Http/HttpClient.hpp>
-#include <Http/Json.hpp>
 #include "IdentityModels.hpp"
-#include "Http/Error.hpp"
+
+#include "../../HttpClient.hpp"
+#include "../../Json.hpp"
+#include "../../Error.hpp"
 
 namespace SpacetimeDB {
     ///

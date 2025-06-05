@@ -1,9 +1,10 @@
 #pragma once
 
+#include "../../Json.hpp"
+#include "../../../Types.h"
+
 #include <iostream>
 #include <variant>
-#include <Http/Json.hpp>
-#include "Types.h"
 
 namespace SpacetimeDB::Database {
 
