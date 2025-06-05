@@ -2,8 +2,14 @@
 
 #include <variant>
 
-
-#include <cpr/cpr.h>
+// Unreal Engine workaround:
+// Before pulling in CPR, push & undefine Unreal Engine’s verify macro:
+#pragma push_macro("verify")
+#undef verify
+#include <cpr/cpr.h> // using libcpr for HTTP
+// Unreal Engine workaround:
+// After including CPR headers, restore the original verify macro:
+#pragma pop_macro("verify")
 
 #include "Error.hpp"
 #include "Json.hpp"

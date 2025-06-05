@@ -1,7 +1,6 @@
 #include "SpacetimeDB/Http/HttpClient.hpp"
 
 #include <iostream>
-#include <cpr/cpr.h>          // Example: using libcpr for HTTP
 #include <stdexcept>
 #include <boost/config/detail/suffix.hpp>
 

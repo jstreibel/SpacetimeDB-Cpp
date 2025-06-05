@@ -1,10 +1,5 @@
 #pragma once
 
-// Unreal Engine workaround:
-// Before pulling in CPR, push & undefine Unreal Engine’s verify macro:
-#pragma push_macro("verify")
-#undef verify
-
 // SDK version
 #include "Version.hpp"
 
@@ -31,6 +26,10 @@
 // (Optionally bring in generated schema types here)
 // #include "Schema/Generated/MySchema.hpp"
 
+// Unreal Engine workaround:
+// Before pulling in CPR, push & undefine Unreal Engine’s verify macro:
+#pragma push_macro("verify")
+#undef verify
 // Unreal Engine workaround:
 // After including CPR headers, restore the original verify macro:
 #pragma pop_macro("verify")
