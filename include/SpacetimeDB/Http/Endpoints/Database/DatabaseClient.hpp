@@ -60,14 +60,10 @@ namespace SpacetimeDB::Database {
 
         /// GET /v1/database/:name_or_identity/subscribe
         /// Begin a WebSocket connection.
-        void Subscribe(const std::string& ModuleName,
-                                   const std::string& SqlQuery,
-                                   const std::function<void(const Json& Event)>& OnEvent);
         HTTP_METHOD_SIGNATURE(Subscribe)
 
         /// POST /v1/database/:name_or_identity/call/:reducer
         /// Invoke a reducer in a database.
-        Result<Json> CallReducer(const String& ModuleName, const String& ReducerName, const Json& Args);
         HTTP_METHOD_SIGNATURE(CallReducer)
 
         /// GET /v1/database/:name_or_identity/schema
