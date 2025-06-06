@@ -3,7 +3,7 @@
 
 namespace SpacetimeDB {
 
-    IdentityClient::IdentityClient(HttpClient& http)
+    IdentityClient::IdentityClient(IHttpClient& http)
       : http_(http)
     {}
 

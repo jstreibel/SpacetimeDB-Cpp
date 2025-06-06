@@ -1,19 +1,17 @@
 #include "SpacetimeDB/Http/HttpClient.hpp"
 
-#include <iostream>
-#include <stdexcept>
-#include <boost/config/detail/suffix.hpp>
+
 
 namespace SpacetimeDB {
-    HttpClient::HttpClient(String BaseUrl, Milliseconds Timeout)
+    IHttpClient::IHttpClient(String BaseUrl, Milliseconds Timeout)
     : BaseUrl(std::move(BaseUrl))
     , timeoutMs_(Timeout) {
         // Optionally configure cpr::Session here
     }
 
-    HttpClient::~HttpClient() = default;
+    IHttpClient::~IHttpClient() = default;
 
-    std::string HttpClient::GetUrl(const std::string& Path, const StringMap& Parameters) const
+    String IHttpClient::GetUrl(const String& Path, const StringMap& Parameters) const
     {
         auto Url = BaseUrl + Path;
 

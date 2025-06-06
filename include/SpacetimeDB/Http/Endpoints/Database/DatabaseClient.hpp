@@ -14,7 +14,7 @@ namespace SpacetimeDB::Database {
     ///  - Subscribe / Reducer calls over WebSocket
     ///  - Etc.
     ///
-    class Client : public HttpClient {
+    class Client : public IHttpClient {
     public:
         ///
         /// Construct with:
@@ -25,7 +25,7 @@ namespace SpacetimeDB::Database {
             const String& NameOrIdentity,
             const String& BaseUrl="http://localhost:3000",
             Milliseconds Timeout=30000);
-        ~Client();
+        ~Client() override;
 
         /// POST /v1/database
         /// Publish a new database given its module code.

@@ -6,7 +6,7 @@ namespace SpacetimeDB {
 
     struct Client::Impl {
         ClientConfig config;
-        HttpClient http;
+        // IHttpClient http;
         bool isOpen = true;
     };
 

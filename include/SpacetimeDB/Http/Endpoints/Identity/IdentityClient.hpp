@@ -13,7 +13,7 @@ namespace SpacetimeDB {
     class IdentityClient {
     public:
         /// Construct with a reference to an existing HttpClient.
-        explicit IdentityClient(HttpClient& http);
+        explicit IdentityClient(IHttpClient& http);
         ~IdentityClient();
 
         [[nodiscard]] Result<IdentityInfo> Login(const String& ExternalJwt) const;
@@ -48,6 +48,6 @@ namespace SpacetimeDB {
         [[nodiscard]] Result<VerifyIdentityResponse> VerifyIdentity(const VerifyIdentityRequest& Request) const;
 
     private:
-        HttpClient& http_;
+        IHttpClient& http_;
     };
 } // namespace SpacetimeDb

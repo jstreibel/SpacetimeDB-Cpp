@@ -8,7 +8,7 @@ namespace SpacetimeDB::Database {
     const String DatabaseEndpoint = "/v1/database";
 
     Client::Client(const String& NameOrIdentity, const String& BaseUrl, const Milliseconds Timeout)
-    : HttpClient(BaseUrl, Timeout)
+    : IHttpClient(BaseUrl, Timeout)
     , NameOrIdentity(NameOrIdentity)
     {
 

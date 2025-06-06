@@ -55,29 +55,29 @@ namespace SpacetimeDB {
      * higher-level code can just think in terms of REST calls without caring about
      * the curl- or socket-level details.
      */
-    class HttpClient {
+    class IHttpClient {
     public:
-        explicit HttpClient(String BaseUrl="http://localhost:3000", int timeoutMs = 30000);
-        ~HttpClient();
+        explicit IHttpClient(String BaseUrl="http://localhost:3000", int timeoutMs = 30000);
+        virtual ~IHttpClient();
 
-        [[nodiscard]] Result<HttpResponse> Get    (const String& Path, const HttpRequest& Request) const;
-        [[nodiscard]] Result<HttpResponse> Post   (const String& Path, const HttpRequest& Request) const;
-        [[nodiscard]] Result<HttpResponse> Delete (const String& Path, const HttpRequest& Request) const;
-        [[nodiscard]] Result<HttpResponse> Put    (const String& Path, const HttpRequest& Request) const;
-        [[nodiscard]] Result<HttpResponse> Patch  (const String& Path, const HttpRequest& Request) const;
+        [[nodiscard]] virtual Result<HttpResponse> Get    (const String& Path, const HttpRequest& Request) const = 0;
+        [[nodiscard]] virtual Result<HttpResponse> Post   (const String& Path, const HttpRequest& Request) const = 0;
+        [[nodiscard]] virtual Result<HttpResponse> Delete (const String& Path, const HttpRequest& Request) const = 0;
+        [[nodiscard]] virtual Result<HttpResponse> Put    (const String& Path, const HttpRequest& Request) const = 0;
+        [[nodiscard]] virtual Result<HttpResponse> Patch  (const String& Path, const HttpRequest& Request) const = 0;
 
-        [[nodiscard]] Result<HttpResponse> Get(
+        [[nodiscard]] virtual Result<HttpResponse> Get(
             const String& Path,
-            const Header& Head = {}) const;
-        [[nodiscard]] Result<HttpResponse> Post(
+            const Header& Head = {}) const = 0;
+        [[nodiscard]] virtual Result<HttpResponse> Post(
             const String& Path,
             const String& Body,
-            const Header& Head = {}) const;
+            const Header& Head = {}) const = 0;
 
         [[nodiscard]] String GetUrl(const String &Path, const StringMap& Parameters={}) const;
 
         [[nodiscard]] String GetBaseUrl() const { return BaseUrl; }
-    private:
+    protected:
         const String BaseUrl;
         int          timeoutMs_;
         // cpr::Session      session_;
