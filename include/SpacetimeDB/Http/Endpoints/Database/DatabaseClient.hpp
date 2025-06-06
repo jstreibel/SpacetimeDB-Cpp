@@ -37,7 +37,7 @@ namespace SpacetimeDB::Database {
 
         /// GET /v1/database/:name_or_identity
         /// Get a JSON description of a database.
-        Result<Response::GetDescription> GetDescription(const Request::GetDescription& Request={}) const;
+        [[nodiscard]] Result<Response::GetDescription> GetDescription(const Request::GetDescription& Request={}) const;
 
         /// DELETE /v1/database/:name_or_identity
         /// Delete a database.

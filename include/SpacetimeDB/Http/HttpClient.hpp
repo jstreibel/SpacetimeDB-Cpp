@@ -1,16 +1,5 @@
 #pragma once
 
-#include <variant>
-
-// Unreal Engine workaround:
-// Before pulling in CPR, push & undefine Unreal Engine’s verify macro:
-#pragma push_macro("verify")
-#undef verify
-#include <cpr/cpr.h> // using libcpr for HTTP
-// Unreal Engine workaround:
-// After including CPR headers, restore the original verify macro:
-#pragma pop_macro("verify")
-
 #include "Error.hpp"
 #include "Json.hpp"
 
@@ -21,7 +10,7 @@
     Result<Response::METHOD_NAME> Client::METHOD_NAME(const Request::METHOD_NAME&) const
 
 namespace SpacetimeDB {
-    using Header = cpr::Header;
+    using Header = Map<String, String>;
 
     struct HttpRequest
     {
@@ -51,9 +40,7 @@ namespace SpacetimeDB {
         long     StatusCode;
         String   Body;
 
-        HttpResponse() = default;
-        explicit HttpResponse(const cpr::Response &Response)
-        : HttpResponse(Response.status_code, Response.text) { }
+        HttpResponse() = delete;
         HttpResponse(const long StatusCode, String Body)
         : StatusCode(StatusCode), Body(std::move(Body)) { }
 
@@ -73,7 +60,12 @@ namespace SpacetimeDB {
         explicit HttpClient(String BaseUrl="http://localhost:3000", int timeoutMs = 30000);
         ~HttpClient();
 
-        [[nodiscard]] cpr::Response Get(const String &Path, const HttpRequest& Request) const;
+        [[nodiscard]] Result<HttpResponse> Get    (const String& Path, const HttpRequest& Request) const;
+        [[nodiscard]] Result<HttpResponse> Post   (const String& Path, const HttpRequest& Request) const;
+        [[nodiscard]] Result<HttpResponse> Delete (const String& Path, const HttpRequest& Request) const;
+        [[nodiscard]] Result<HttpResponse> Put    (const String& Path, const HttpRequest& Request) const;
+        [[nodiscard]] Result<HttpResponse> Patch  (const String& Path, const HttpRequest& Request) const;
+
         [[nodiscard]] Result<HttpResponse> Get(
             const String& Path,
             const Header& Head = {}) const;
@@ -82,9 +74,7 @@ namespace SpacetimeDB {
             const String& Body,
             const Header& Head = {}) const;
 
-        cpr::Response Delete(const String& Path, const HttpRequest& Head) const;
-
-        [[nodiscard]] String GetUrl(const String &Path, StringMap Parameters={}) const;
+        [[nodiscard]] String GetUrl(const String &Path, const StringMap& Parameters={}) const;
 
         [[nodiscard]] String GetBaseUrl() const { return BaseUrl; }
     private:

@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 3.15)
 project(SpacetimeDBSdk VERSION 0.1.0 LANGUAGES CXX)
 
 # Options
-option(STDB_BUILD_EXAMPLES "Build example executables" OFF)
-option(STDB_BUILD_TESTS    "Build unit tests"          OFF)
+option(STDB_BUILD_EXAMPLES "Build example executables"  OFF)
+option(STDB_BUILD_TESTS    "Build unit tests"           OFF)
+option(STDB_HTTP_USE_CPR       "Use libcpr as http backend" OFF)
 
 # C++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -29,13 +30,18 @@ target_include_directories(SpacetimeDBSdk PUBLIC
 # Use FetchContent to pull in cpr:
 include(FetchContent)
 
-# ── Fetch Curl for People ─────────────────────────────────────────────────────
-FetchContent_Declare(
-        cpr
-        GIT_REPOSITORY https://github.com/libcpr/cpr.git
-        GIT_TAG dd967cb48ea6bcbad9f1da5ada0db8ac0d532c06
-)
-FetchContent_MakeAvailable(cpr)
+if(NOT STDB_HTTP_USE_CPR)
+    TARGET_COMPILE_DEFINITIONS(SpacetimeDBSdk PUBLIC NO_CPR=true)
+    set(STDB_HTTP_LINK cpr::cpr)
+else()
+    # ── Fetch Curl for People ─────────────────────────────────────────────────────
+    FetchContent_Declare(
+            cpr
+            GIT_REPOSITORY https://github.com/libcpr/cpr.git
+            GIT_TAG dd967cb48ea6bcbad9f1da5ada0db8ac0d532c06
+    )
+    FetchContent_MakeAvailable(cpr)
+endif ()
 
 # ── Fetch nlohmann_json ───────────────────────────────────────────────────────
 FetchContent_Declare(
@@ -56,11 +62,13 @@ set (BUILD_EXAMPLES OFF CACHE BOOL "Build websocketpp examples."    FORCE )
 set (BUILD_TESTS    OFF CACHE BOOL "Build websocketpp tests."       FORCE )
 FetchContent_MakeAvailable(websocketpp)
 # <— so <websocketpp/...> can be found:
+
+
 target_include_directories(SpacetimeDBSdk PUBLIC ${websocketpp_SOURCE_DIR})
 
-
 target_link_libraries(SpacetimeDBSdk PUBLIC
-        cpr::cpr
+        #cpr::cpr
+        $STDB_HTTP_LINK
         nlohmann_json::nlohmann_json
         # websocketpp::websocketpp
 )

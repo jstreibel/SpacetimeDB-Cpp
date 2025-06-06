@@ -25,6 +25,9 @@ namespace SpacetimeDB
     using Milliseconds = Int;
     using StringMap = std::map<String, String>;
 
+    template <typename T1, typename T2>
+    using Map = std::map<T1, T2, std::less<T1>>;
+
     template <typename T>
     using Array = std::vector<T>;
 

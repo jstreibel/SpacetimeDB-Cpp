@@ -2,6 +2,8 @@
 
 #include "../Types.h"
 
+#include <variant>
+
 namespace SpacetimeDB {
 
     using ErrorType = std::runtime_error;
@@ -13,7 +15,7 @@ namespace SpacetimeDB {
         return SpacetimeDB::ErrorType("Location " + String(__FILE__) + ":" + std::to_string(__LINE__) + "\n\tMessage: \"" + (Message) + "\"")
 
     #define OnError(CallResult, Message) \
-        if (!SpacetimeDB::IsValid(CallResult)) ReturnError(Message);
+        if (!SpacetimeDB::IsValid(CallResult)) ReturnError(String(Message) + " error: " + GetErrorMessage(CallResult));
 
 
     template<typename RETURN_TYPE>
